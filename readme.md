@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Stitch Generated Screens
+
+The following screens have been integrated from the Stitch project (Prediction Market Home Page):
+
+- **Home Page** (`app/page.tsx`): The main landing page with market listings, trending categories, and your portfolio summary. Accessible at `/`.
+- **Market Detail View** (`app/market/page.tsx`): Detailed view for a specific market, featuring a probability chart, rules, and a trade position panel. Accessible at `/market`.
+
+Original design images used for these pages have been downloaded to `public/stitch_screenshots/`.
