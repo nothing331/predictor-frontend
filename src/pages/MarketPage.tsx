@@ -1,23 +1,19 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
-export default function MarketDetail() {
+export default function MarketPage() {
   return (
     <>
       <div className="flex min-h-screen">
         {/*  Left Sidebar  */}
         <aside className="w-20 md:w-24 bg-onyx border-r-4 border-black flex flex-col items-center py-8 sticky top-0 h-screen shrink-0">
           <div className="mb-12">
-            <div className="w-12 h-12 bg-primary border-4 border-black flex items-center justify-center neubrutalism-shadow-sm">
+            <Link to="/" className="block w-12 h-12 bg-primary border-4 border-black flex items-center justify-center neubrutalism-shadow-sm">
               <span className="material-symbols-outlined text-black font-bold">
                 bolt
               </span>
-            </div>
+            </Link>
           </div>
-          <div className="flex-1 flex items-center justify-center">
-            <h1 className="vertical-text text-primary text-2xl md:text-3xl font-black uppercase tracking-tighter transform rotate-180">
-              <br />
-            </h1>
-          </div>
+          <div className="flex-1 flex items-center justify-center" />
           <div className="mt-8 flex flex-col gap-6 text-slate-400">
             <span className="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">
               dashboard
@@ -39,12 +35,9 @@ export default function MarketDetail() {
           <main className="flex-1 p-6 md:p-10 bg-background-light dark:bg-background-dark">
             {/*  Header / Breadcrumb  */}
             <nav className="flex items-center gap-3 text-sm font-bold uppercase mb-8">
-              <a className="text-slate-500 hover:text-primary" href="#">
+              <Link className="text-slate-500 hover:text-primary" to="/">
                 Markets
-              </a>
-              <a className="text-slate-500 hover:text-primary" href="#">
-                <br />
-              </a>
+              </Link>
               <span className="material-symbols-outlined text-xs">
                 arrow_forward_ios
               </span>
@@ -91,34 +84,18 @@ export default function MarketDetail() {
               <div className="relative h-64 w-full bg-slate-100 dark:bg-black/40 border-2 border-black overflow-hidden mb-4">
                 {/*  Grid Lines  */}
                 <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 pointer-events-none">
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-r border-b border-black/10"></div>
-                  <div className="border-b border-black/10"></div>
-                  <div className="border-r border-black/10"></div>
-                  <div className="border-r border-black/10"></div>
-                  <div className="border-r border-black/10"></div>
-                  <div className="border-r border-black/10"></div>
-                  <div className="border-r border-black/10"></div>
-                  <div></div>
+                  {Array.from({ length: 24 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`${i % 6 !== 5 ? "border-r" : ""} ${
+                        i < 18 ? "border-b" : ""
+                      } border-black/10`}
+                    />
+                  ))}
                 </div>
                 {/*  SVG Line Graph  */}
                 <svg
-                  className="absolute inset-0 w-full h-full preserve-3d"
+                  className="absolute inset-0 w-full h-full"
                   viewBox="0 0 1000 256"
                 >
                   <path
@@ -126,12 +103,12 @@ export default function MarketDetail() {
                     fill="none"
                     stroke="#CCFF00"
                     strokeWidth="6"
-                  ></path>
+                  />
                   <path
                     d="M0,200 Q100,180 200,210 T400,150 T600,100 T800,80 T1000,60 V256 H0 Z"
                     fill="url(#limeGradient)"
                     fillOpacity="0.2"
-                  ></path>
+                  />
                   <defs>
                     <linearGradient
                       id="limeGradient"
@@ -140,18 +117,18 @@ export default function MarketDetail() {
                       y1="0%"
                       y2="100%"
                     >
-                      <stop offset="0%"></stop>
-                      <stop offset="100%"></stop>
+                      <stop offset="0%" stopColor="#CCFF00" />
+                      <stop offset="100%" stopColor="#CCFF00" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                 </svg>
               </div>
               <div className="flex justify-between font-mono text-xs font-bold uppercase text-slate-500">
-                <span className="">May 01</span>
-                <span className="">May 08</span>
-                <span className="">May 15</span>
-                <span className="">May 22</span>
-                <span className="">Today</span>
+                <span>May 01</span>
+                <span>May 08</span>
+                <span>May 15</span>
+                <span>May 22</span>
+                <span>Today</span>
               </div>
             </section>
             <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,16 +149,16 @@ export default function MarketDetail() {
                 </h3>
                 <div className="space-y-3 font-mono text-xs">
                   <div className="flex justify-between border-b border-white/20 pb-1">
-                    <span className="">0x4f...2a bought YES</span>
-                    <span className="">$420.00</span>
+                    <span>0x4f...2a bought YES</span>
+                    <span>$420.00</span>
                   </div>
                   <div className="flex justify-between border-b border-white/20 pb-1">
-                    <span className="">Whale_Alert bought NO</span>
-                    <span className="">$2,500.00</span>
+                    <span>Whale_Alert bought NO</span>
+                    <span>$2,500.00</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="">0x91...bc bought YES</span>
-                    <span className="">$15.00</span>
+                    <span>0x91...bc bought YES</span>
+                    <span>$15.00</span>
                   </div>
                 </div>
               </div>
@@ -280,7 +257,7 @@ export default function MarketDetail() {
                 <div className="w-10 h-10 rounded-full border-2 border-black bg-primary flex items-center justify-center neubrutalism-shadow-sm overflow-hidden">
                   <img
                     className="w-full h-full object-cover"
-                    data-alt="User profile avatar"
+                    alt="User profile avatar"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSPgIIrZf9SxVuZareDQ_0loMnWpQ0N78tKdOdz4bz6mUVdey43LZD7iFUZ--ynleXOTWzv_FI4mWu2rvVhR-pGG6mKRzncunxgxkpLjNPjqF8qv3Gus6846EHkEwV8mBwRGbt8lLaiw0VOcCThT5kNsK40EueLnGetCumLyX6Z8C8oqEF9dMhYlK1ZqgnhFp2JAWjPNeD4S4GA9iB1_mN_P8xKhKvo4p2zwEryOpxGudGJDwfKzYegm1KT4PZaB1w7jdAE8yYiCqE"
                   />
                 </div>

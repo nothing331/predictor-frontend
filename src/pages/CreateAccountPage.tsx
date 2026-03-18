@@ -1,10 +1,6 @@
-"use client";
+import { Link } from "react-router-dom";
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-
-export default function CreateAccount() {
+export default function CreateAccountPage() {
   return (
     <div className="bg-slate-900 font-display text-slate-100 min-h-screen flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md">
@@ -77,11 +73,11 @@ export default function CreateAccount() {
               Create Account
             </button>
             <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t-2 border-slate-700"></div>
+              <div className="flex-grow border-t-2 border-slate-700" />
               <span className="flex-shrink mx-4 text-slate-500 text-xs font-bold uppercase">
                 Or continue with
               </span>
-              <div className="flex-grow border-t-2 border-slate-700"></div>
+              <div className="flex-grow border-t-2 border-slate-700" />
             </div>
             {/* Google Button */}
             <button
@@ -100,10 +96,10 @@ export default function CreateAccount() {
         {/* Footer Link */}
         <div className="mt-8 text-center">
           <p className="text-slate-400 font-medium">
-            Already have an account?
+            Already have an account?{" "}
             <Link
               className="text-[#7bf425] font-bold underline decoration-2 underline-offset-4 hover:text-white transition-colors"
-              href="/login"
+              to="/login"
             >
               SIGN IN
             </Link>
@@ -112,10 +108,10 @@ export default function CreateAccount() {
       </div>
       {/* Decorative Elements */}
       <div className="fixed top-10 left-10 -z-10 opacity-20 hidden lg:block">
-        <div className="w-32 h-32 bg-[#7bf425] border-4 border-black neubrutalist-shadow rotate-12"></div>
+        <div className="w-32 h-32 bg-[#7bf425] border-4 border-black neubrutalist-shadow rotate-12" />
       </div>
       <div className="fixed bottom-10 right-10 -z-10 opacity-20 hidden lg:block">
-        <div className="w-48 h-48 bg-slate-700 border-4 border-black neubrutalist-shadow -rotate-6"></div>
+        <div className="w-48 h-48 bg-slate-700 border-4 border-black neubrutalist-shadow -rotate-6" />
       </div>
     </div>
   );

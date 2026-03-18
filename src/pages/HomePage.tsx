@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-export default function Home() {
+export default function HomePage() {
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -47,12 +45,11 @@ export default function Home() {
             <div className="flex items-center gap-3 p-2 bg-slate-100 dark:bg-slate-900 neubrutal-border">
               <div
                 className="size-10 rounded-full bg-cover border-2 border-black"
-                data-alt="User profile avatar with colorful geometric pattern"
                 style={{
                   backgroundImage:
                     "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCL38SGZk--t58uopcrcW8T7VXiwfhTXlgKX8VCsQnpqd8wXUKPxVvgLHeID51mLXCmWxCZVueyE-5Tcra7mZ8HFjTGiaK8q_V2MjwdJf5r8jEogiHeUjjt1GLE91ItmvJVvrZhSlnHh-SJPYjOJ8d1iQUIjEeKARVMagjr4VcgxQzYsZULiVYmw-Eku1VyjMUW6ISeHimttml7qfJ-XF3AUnmbhEmSzArE9a0bfxQMCsAvkIpmn5AQZHOrATpAxEYcYno204FLd3hl')",
                 }}
-              ></div>
+              />
               <div className="flex flex-col overflow-hidden">
                 <span className="text-xs font-bold uppercase opacity-60">
                   Balance
@@ -111,12 +108,11 @@ export default function Home() {
             <div className="bg-white dark:bg-slate-900 neubrutal-border shadow-neubrutal flex flex-col">
               <div
                 className="h-48 bg-cover bg-center border-b-4 border-black"
-                data-alt="Abstract neural network representation in neon colors"
                 style={{
                   backgroundImage:
                     "url('https://lh3.googleusercontent.com/aida-public/AB6AXuA69toKJ_WjQEpY9ggv2n16cMi32jvX3d7bne-VRyhaek1U70YSfL83hok9FD-kHho8hMXtXJ62FTtwDozjeUXmv5vS-nmCYi5MlpikHD-VnmRurPfxilRWx8x-VE96-tSAS7BQ78inX1W6Ovi2NMhgR2l3lCKIwRuyE1kesIcFbKNAuyaaYqjZxXbJ8mpWNzdrKA-It8QIyR5O4bSYuxiIMvVRKG4xbi-4lF31uFjr9edEtLdWndUcA9_xfxO1FmYw6xdjFIjWU2Go')",
                 }}
-              ></div>
+              />
               <div className="p-6 flex flex-col grow">
                 <div className="flex justify-between items-start mb-4">
                   <span className="px-3 py-1 bg-secondary text-white text-xs font-black uppercase neubrutal-border">
@@ -136,7 +132,7 @@ export default function Home() {
                     <span className="text-primary">68%</span>
                   </div>
                   <div className="w-full h-6 bg-slate-200 dark:bg-slate-800 neubrutal-border p-1">
-                    <div className="h-full bg-primary"></div>
+                    <div className="h-full bg-primary" style={{ width: "68%" }} />
                   </div>
                 </div>
                 {/*  Betting Buttons  */}
@@ -154,12 +150,11 @@ export default function Home() {
             <div className="bg-white dark:bg-slate-900 neubrutal-border shadow-neubrutal flex flex-col">
               <div
                 className="h-48 bg-cover bg-center border-b-4 border-black"
-                data-alt="Blurred government building with dramatic lighting"
                 style={{
                   backgroundImage:
                     "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBNfidmuRF12FQQGLJ7J2t-m-Y8TP0F3c1EFgvcnPCIh63IFhoviWfsUnnMUaUVh8kn5yE1p32ADDxkOoq-qg6FfvAwyfivFLTL_76V5JWWf1YOjv7f-4t4O9btz_ooM0qHDjhCQfmiz54faG0k01qu1s3JjBJhdeK0JptE7rfalNRkp-8IVP-LU30fzzdhVoJNJmn3cTh0Nyhi13CSSJLw18aDFN-KBf4NAIl5vSS4mcsonbIKdDs5EPUF4-VWrB3rZUI8CV8Luk8c')",
                 }}
-              ></div>
+              />
               <div className="p-6 flex flex-col grow">
                 <div className="flex justify-between items-start mb-4">
                   <span className="px-3 py-1 bg-primary text-black text-xs font-black uppercase neubrutal-border">
@@ -179,7 +174,7 @@ export default function Home() {
                     <span className="text-secondary">42%</span>
                   </div>
                   <div className="w-full h-6 bg-slate-200 dark:bg-slate-800 neubrutal-border p-1">
-                    <div className="h-full bg-secondary"></div>
+                    <div className="h-full bg-secondary" style={{ width: "42%" }} />
                   </div>
                 </div>
                 {/*  Betting Buttons  */}
@@ -197,12 +192,11 @@ export default function Home() {
             <div className="bg-white dark:bg-slate-900 neubrutal-border shadow-neubrutal flex flex-col">
               <div
                 className="h-48 bg-cover bg-center border-b-4 border-black"
-                data-alt="High-speed motion blur of a basketball game"
                 style={{
                   backgroundImage:
                     "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDM6kPfDW9rBViTCWJwmm9GYC0d9rFJ3_V_XFNuV_SyC7LKOup3NFTTYiWIYSaGtuFAVRsR3m3IGjqIXOw_0UQAKvG0EqzWkD0hk2-sBkCEK57snWA3ZX1H66fWVmrrzNT3cnNhbylyglSFgc5oSqm427z2d2OEDZAjN8wPR26zOAupN8rkQ1DmoMkDvHYbvtxpfjo33R-xwh-PEguAxKmJvqa8edm0O2TSJ143TVtr7N1dT4jCFFVtu6WtZsTu5FmewM7-5IGZZN80')",
                 }}
-              ></div>
+              />
               <div className="p-6 flex flex-col grow">
                 <div className="flex justify-between items-start mb-4">
                   <span className="px-3 py-1 bg-[#FFD700] text-black text-xs font-black uppercase neubrutal-border">
@@ -222,7 +216,7 @@ export default function Home() {
                     <span className="text-primary">15%</span>
                   </div>
                   <div className="w-full h-6 bg-slate-200 dark:bg-slate-800 neubrutal-border p-1">
-                    <div className="h-full bg-primary"></div>
+                    <div className="h-full bg-primary" style={{ width: "15%" }} />
                   </div>
                 </div>
                 {/*  Betting Buttons  */}
@@ -243,19 +237,17 @@ export default function Home() {
               <h2 className="text-4xl font-black slanted-display italic uppercase">
                 Your Portfolio
               </h2>
-              <div className="h-1 grow bg-black dark:bg-white/20"></div>
+              <div className="h-1 grow bg-black dark:bg-white/20" />
             </div>
             <div className="bg-white dark:bg-black neubrutal-border shadow-neubrutal-purple overflow-hidden">
               <table className="w-full text-left">
                 <thead>
                   <tr className="border-b-4 border-black bg-slate-50 dark:bg-slate-900">
                     <th className="p-4 font-black uppercase italic">Market</th>
-                    <th className="p-4 font-black uppercase italic">
-                      Position
-                    </th>
+                    <th className="p-4 font-black uppercase italic">Position</th>
                     <th className="p-4 font-black uppercase italic">Value</th>
                     <th className="p-4 font-black uppercase italic">Change</th>
-                    <th className="p-4"></th>
+                    <th className="p-4" />
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-black/10 dark:divide-white/10">
@@ -275,9 +267,7 @@ export default function Home() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="p-4 font-bold">
-                      2024 Presidential Election
-                    </td>
+                    <td className="p-4 font-bold">2024 Presidential Election</td>
                     <td className="p-4">
                       <span className="px-2 py-1 bg-accent-red/20 text-accent-red text-xs font-black uppercase border-2 border-accent-red">
                         NO (500 Shares)

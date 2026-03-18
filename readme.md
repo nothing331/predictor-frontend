@@ -1,45 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# predictKaro — Frontend
+
+A **Neubrutalist prediction market** web app built with React + Vite.
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | [React 19](https://react.dev/) + [Vite 6](https://vitejs.dev/) |
+| Routing | [React Router v7](https://reactrouter.com/) |
+| Data Fetching | [TanStack Query v5](https://tanstack.com/query) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) (Vite plugin) |
+| Language | TypeScript 5 |
+| Fonts | Space Grotesk · Space Mono · Material Symbols (Google Fonts) |
+
+## Project Structure
+
+```
+predictor-frontend/
+├── index.html               # Vite root HTML (fonts + icons preloaded)
+├── vite.config.ts           # Vite + @tailwindcss/vite + path alias (@/)
+├── tsconfig.json            # Bundler mode TypeScript config
+├── package.json
+└── src/
+    ├── main.tsx             # Entry: QueryClientProvider + BrowserRouter
+    ├── App.tsx              # Route definitions
+    ├── index.css            # Tailwind + custom design tokens / utilities
+    └── pages/
+        ├── HomePage.tsx         # / — Market listings + portfolio summary
+        ├── LoginPage.tsx        # /login — Sign-in form
+        ├── CreateAccountPage.tsx # /create-account — Registration form
+        └── MarketPage.tsx       # /market — Market detail + trade panel
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:5173
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Other available commands:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build      # Production build (tsc + vite build)
+npm run preview    # Preview production build locally
+npm run lint       # ESLint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pages & Routes
 
-## Learn More
+| Route | Page | Description |
+|---|---|---|
+| `/` | Home | Market grid, category filters, portfolio table |
+| `/login` | Login | Username + password sign-in, Google OAuth |
+| `/create-account` | Create Account | Registration with username, email, password |
+| `/market` | Market Detail | Probability chart, trade panel, activity log |
 
-To learn more about Next.js, take a look at the following resources:
+## Design System
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app uses a **Neubrutalist** aesthetic defined in `src/index.css`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## Stitch Generated Screens
-
-The following screens have been integrated from the Stitch project (Prediction Market Home Page):
-
-- **Home Page** (`app/page.tsx`): The main landing page with market listings, trending categories, and your portfolio summary. Accessible at `/`.
-- **Market Detail View** (`app/market/page.tsx`): Detailed view for a specific market, featuring a probability chart, rules, and a trade position panel. Accessible at `/market`.
-
-Original design images used for these pages have been downloaded to `public/stitch_screenshots/`.
+- **Colors**: `--color-primary` (#CCFF00 lime), `--color-secondary` (#8A2BE2 purple), accent red/green
+- **Shadows**: `shadow-neubrutal`, `shadow-neubrutal-lg`, `shadow-neubrutal-lime`, `shadow-neubrutal-purple`
+- **Utilities**: `.neubrutal-border`, `.neubrutalist-shadow`, `.slanted-display`, `.vertical-text`
+- **Typography**: Space Grotesk (display) · Space Mono (mono)
+- **Borders**: All radii set to `0px` for the brutalist squared-off look
