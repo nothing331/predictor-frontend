@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Saira+Condensed:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Saira+Condensed:wght@500;600;700;800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
 @import "tailwindcss";
 
@@ -11,9 +11,10 @@
   --color-accent-red: #ff6474;
   --color-accent-green: #3dd7a8;
 
-  --font-display: "Saira Condensed", sans-serif;
-  --font-body: "IBM Plex Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-brand: "Saira Condensed", sans-serif;
+  --font-display: "Oswald", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-mono: "Manrope", sans-serif;
 
   --radius-DEFAULT: 0px;
   --radius-lg: 0px;
@@ -36,6 +37,16 @@
   --grid-line: rgba(22, 19, 15, 0.08);
   --hero-glow: rgba(214, 255, 87, 0.24);
   --hero-glow-secondary: rgba(110, 124, 255, 0.18);
+  --step-12: 0.75rem;
+  --step-16: 1rem;
+  --step-20: 1.25rem;
+  --step-24: 1.5rem;
+  --step-28: 1.75rem;
+  --step-32: 2rem;
+  --step-36: 2.25rem;
+  --step-40: 2.5rem;
+  --step-44: 2.75rem;
+  --step-48: 3rem;
   color-scheme: light;
 }
 
@@ -77,6 +88,8 @@ body {
     linear-gradient(180deg, color-mix(in srgb, var(--page-bg) 84%, white 16%), var(--page-bg) 38%, var(--page-bg-muted));
   color: var(--text-strong);
   font-family: var(--font-body);
+  font-size: var(--step-16);
+  line-height: 1.5;
   transition:
     background-color 180ms ease,
     color 180ms ease;
@@ -147,37 +160,99 @@ a {
   background: var(--surface-soft);
 }
 
+.app-panel-subtle {
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
 .display-title {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 4vw, 4.8rem);
-  font-style: italic;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  line-height: 0.9;
+  font-size: var(--step-48);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 0.95;
   text-transform: uppercase;
 }
 
 .section-title {
   font-family: var(--font-display);
-  font-size: clamp(1.7rem, 2vw, 2.5rem);
-  font-style: italic;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 0.95;
+  font-size: var(--step-32);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
   text-transform: uppercase;
 }
 
 .eyebrow {
   color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-family: var(--font-body);
+  font-size: var(--step-12);
   font-weight: 600;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .muted-copy {
   color: var(--text-muted);
+}
+
+.type-body-sm {
+  font-size: var(--step-12);
+  line-height: 1.5;
+}
+
+.type-body-md {
+  font-size: var(--step-16);
+  line-height: 1.5;
+}
+
+.type-body-lg {
+  font-size: var(--step-20);
+  line-height: 1.4;
+}
+
+.type-heading-sm {
+  font-family: var(--font-display);
+  font-size: var(--step-24);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.type-heading-md {
+  font-family: var(--font-display);
+  font-size: var(--step-32);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.type-heading-lg {
+  font-family: var(--font-display);
+  font-size: var(--step-36);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.type-value-md {
+  font-family: var(--font-display);
+  font-size: var(--step-32);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.type-value-lg {
+  font-family: var(--font-display);
+  font-size: var(--step-40);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.type-utility {
+  font-family: var(--font-body);
+  font-size: var(--step-16);
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .brand-mark {
@@ -199,12 +274,12 @@ a {
 }
 
 .brand-wordmark {
-  font-family: var(--font-display);
-  font-size: 2rem;
+  font-family: var(--font-brand);
+  font-size: var(--step-40);
   font-style: italic;
   font-weight: 800;
   letter-spacing: 0.08em;
-  line-height: 0.85;
+  line-height: 0.9;
   text-transform: uppercase;
 }
 
@@ -213,10 +288,10 @@ a {
   border: 3px solid transparent;
   display: flex;
   gap: 0.9rem;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-size: var(--step-16);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   padding: 0.9rem 1rem;
   text-transform: uppercase;
   transition:
@@ -245,12 +320,12 @@ a {
   align-items: center;
   border: 3px solid var(--border-strong);
   display: inline-flex;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
+  font-family: var(--font-body);
+  font-size: var(--step-16);
   font-weight: 700;
   gap: 0.6rem;
   justify-content: center;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   padding: 0.95rem 1.25rem;
   text-transform: uppercase;
   transition:
@@ -288,11 +363,11 @@ a {
   align-items: center;
   border: 2px solid var(--border-strong);
   display: inline-flex;
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-family: var(--font-body);
+  font-size: var(--step-12);
   font-weight: 600;
   gap: 0.4rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   padding: 0.55rem 0.8rem;
   text-transform: uppercase;
 }
@@ -322,11 +397,10 @@ a {
 
 .metric-value {
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  font-style: italic;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  line-height: 0.9;
+  font-size: var(--step-40);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -345,6 +419,8 @@ a {
   background: transparent;
   border: 0;
   color: var(--text-strong);
+  font-family: var(--font-body);
+  font-size: var(--step-16);
   min-height: 3.75rem;
   outline: 0;
   width: 100%;
@@ -353,6 +429,68 @@ a {
 .app-input::placeholder {
   color: var(--text-muted);
   text-transform: uppercase;
+}
+
+.auth-stage {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.auth-card {
+  margin: 0 auto;
+  max-width: 34rem;
+  overflow: hidden;
+}
+
+.auth-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.auth-google {
+  align-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 88%, white 12%),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+  border: 1px solid var(--border-soft);
+  display: flex;
+  gap: 0.9rem;
+  justify-content: center;
+  padding: 0.95rem 1.2rem;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.auth-google:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 38%, var(--border-soft));
+  transform: translateY(-1px);
+}
+
+.auth-google-mark {
+  align-items: center;
+  background: white;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: none;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.section-divider {
+  border-top: 1px solid var(--border-soft);
+}
+
+.surface-line {
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .market-card {
@@ -402,10 +540,10 @@ a {
 }
 
 .data-table th {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: var(--step-12);
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-align: left;
   text-transform: uppercase;
 }
@@ -468,7 +606,7 @@ a {
   }
 
   .display-title {
-    font-size: clamp(2rem, 13vw, 3rem);
+    font-size: var(--step-40);
   }
 
   .data-table {
