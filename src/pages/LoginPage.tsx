@@ -1,56 +1,21 @@
 import { Link } from "react-router-dom";
 import AuthScaffold from "../components/AuthScaffold";
 
-const highlights = [
-  {
-    icon: "bolt",
-    title: "Fast entries",
-    copy: "Jump back into active markets with one consistent desk, unified card styling, and cleaner contrast in dark mode.",
-  },
-  {
-    icon: "hub",
-    title: "Signal context",
-    copy: "See who is moving, where conviction is clustering, and which contracts are accelerating before you place a trade.",
-  },
-  {
-    icon: "verified",
-    title: "Clear settlements",
-    copy: "Rules, activity, and position details now read like one product instead of separate mockups stitched together.",
-  },
-];
-
-const stats = [
-  { label: "Open interest", value: "$94M" },
-  { label: "Active traders", value: "18K" },
-  { label: "Avg. settle", value: "3 min" },
-];
-
 export default function LoginPage() {
   return (
     <AuthScaffold
       eyebrow="Member access"
-      highlights={highlights}
-      stats={stats}
-      subtitle="Sign in to pick up where you left off, monitor conviction shifts, and place trades from the same polished interface on every screen."
-      title="Return to the prediction desk."
+      subtitle="Use your handle to sync positions, watchlists, and portfolio history from the same trading desk language."
+      title="Sign in"
     >
-      <div className="mx-auto w-full max-w-md space-y-8">
-        <div className="space-y-3 text-center">
-          <p className="eyebrow">Welcome back</p>
-          <h2 className="section-title">Sign in</h2>
-          <p className="muted-copy">
-            Use your handle to sync positions, watchlists, and portfolio
-            history.
-          </p>
-        </div>
-
+      <div className="mx-auto w-full max-w-md space-y-7">
         <form
           className="space-y-5"
           onSubmit={(event) => event.preventDefault()}
         >
           <label className="block">
             <span className="eyebrow mb-3 block">Username</span>
-            <div className="app-panel field-shell">
+            <div className="app-panel-subtle field-shell">
               <span className="material-symbols-outlined">alternate_email</span>
               <input
                 className="app-input"
@@ -62,7 +27,7 @@ export default function LoginPage() {
 
           <label className="block">
             <span className="eyebrow mb-3 block">Password</span>
-            <div className="app-panel field-shell">
+            <div className="app-panel-subtle field-shell">
               <span className="material-symbols-outlined">lock</span>
               <input
                 className="app-input"
@@ -72,28 +37,27 @@ export default function LoginPage() {
             </div>
           </label>
 
-          <div className="flex items-center justify-between gap-4 text-sm">
+          <div className="type-body-sm flex items-center justify-between gap-4">
             <span className="muted-copy">Protected with session recovery</span>
             <a className="eyebrow text-secondary" href="#">
               Forgot?
             </a>
           </div>
 
-          <button className="action-primary w-full justify-center text-base">
+          <button className="action-primary w-full justify-center">
             Sign in
           </button>
+        </form>
 
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-[var(--border-soft)]" />
-            <span className="eyebrow">Or continue with</span>
-            <div className="h-px flex-1 bg-[var(--border-soft)]" />
-          </div>
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-[var(--border-soft)]" />
+          <span className="eyebrow">Or continue with</span>
+          <div className="h-px flex-1 bg-[var(--border-soft)]" />
+        </div>
 
-          <button
-            className="action-ghost w-full justify-center bg-white !text-black"
-            type="button"
-          >
-            <svg className="h-5 w-5" viewBox="0 0 24 24">
+        <button className="auth-google w-full" type="button">
+          <span className="auth-google-mark">
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -111,13 +75,18 @@ export default function LoginPage() {
                 fill="#EA4335"
               />
             </svg>
+          </span>
+          <span className="type-body-sm font-mono font-semibold uppercase tracking-[0.12em]">
             Continue with Google
-          </button>
-        </form>
+          </span>
+        </button>
 
-        <p className="text-center text-sm text-[color:var(--text-muted)]">
+        <p className="type-body-sm text-center text-[color:var(--text-muted)]">
           New to the desk?{" "}
-          <Link className="font-semibold uppercase tracking-[0.18em] text-primary" to="/create-account">
+          <Link
+            className="font-semibold uppercase tracking-[0.18em] text-primary"
+            to="/create-account"
+          >
             Create account
           </Link>
         </p>

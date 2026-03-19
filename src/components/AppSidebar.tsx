@@ -18,13 +18,13 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
     <aside className="app-panel app-panel-strong flex h-full flex-col gap-8 p-5 lg:sticky lg:top-6 lg:min-h-[calc(100vh-3rem)]">
       <BrandMark />
 
-      <div className="app-panel app-panel-soft p-4">
+      {/* <div className="app-panel app-panel-soft p-4">
         <p className="eyebrow mb-3">Daily Brief</p>
-        <p className="text-lg font-semibold leading-relaxed">
+        <p className="type-body-lg font-semibold leading-relaxed">
           Track momentum, place fast positions, and keep every market in one
           coordinated desk.
         </p>
-      </div>
+      </div> */}
 
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => (
@@ -54,7 +54,7 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="metric-value text-primary">$12.45K</p>
-                <p className="muted-copy text-sm">24 open positions</p>
+                <p className="muted-copy type-body-sm">24 open positions</p>
               </div>
               <span className="chip chip-soft">+8.4% week</span>
             </div>

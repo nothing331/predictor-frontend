@@ -12,7 +12,7 @@ export default function BrandMark({
   return (
     <Link className="brand-mark" to={to}>
       <span className="brand-sigil">
-        <span className="material-symbols-outlined text-3xl font-bold">
+        <span className="material-symbols-outlined text-[2rem] font-bold">
           bolt
         </span>
       </span>
