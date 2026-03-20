@@ -421,14 +421,35 @@ a {
   color: var(--text-strong);
   font-family: var(--font-body);
   font-size: var(--step-16);
+  line-height: 1.25;
   min-height: 3.75rem;
   outline: 0;
+  padding: 0.2rem 0;
   width: 100%;
 }
 
 .app-input::placeholder {
   color: var(--text-muted);
   text-transform: uppercase;
+}
+
+.search-shell {
+  min-height: 4rem;
+  padding-inline: 1.25rem;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 68%, transparent),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+}
+
+.search-shell .material-symbols-outlined {
+  color: color-mix(in srgb, var(--text-muted) 82%, transparent);
+}
+
+.search-input {
+  min-height: 4rem;
 }
 
 .auth-stage {

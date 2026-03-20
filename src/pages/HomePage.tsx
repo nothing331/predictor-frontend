@@ -78,47 +78,47 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <div className="page-content">
+        <header className="surface-line mb-8 pb-8">
+          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <BrandMark caption="Live probability board" />
+
+            <div className="flex flex-1 flex-col gap-4 xl:max-w-4xl xl:flex-row xl:items-center xl:justify-end">
+              <label className="app-panel-subtle field-shell search-shell flex-1">
+                <span className="material-symbols-outlined">search</span>
+                <input
+                  className="app-input search-input uppercase"
+                  placeholder="Search markets, creators, or topics"
+                  type="text"
+                />
+              </label>
+
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category, index) => (
+                  <button
+                    key={category}
+                    className={`chip ${
+                      index === 0 ? "chip-primary" : "chip-soft"
+                    } ${index !== 0 ? "!border-transparent !bg-transparent" : ""}`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Link className="action-ghost !border-transparent !px-3" to="/login">
+                  Sign in
+                </Link>
+                <Link className="action-secondary" to="/create-account">
+                  Join now
+                </Link>
+              </div>
+            </div>
+          </div>
+        </header>
+
         <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_320px]">
           <main className="min-w-0">
-            <header className="surface-line mb-8 pb-8">
-              <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-                <BrandMark caption="Live probability board" />
-
-                <div className="flex flex-1 flex-col gap-4 xl:max-w-4xl xl:flex-row xl:items-center xl:justify-end">
-                  <label className="app-panel-subtle field-shell flex-1">
-                    <span className="material-symbols-outlined">search</span>
-                    <input
-                      className="app-input uppercase"
-                      placeholder="Search markets, creators, or topics"
-                      type="text"
-                    />
-                  </label>
-
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category, index) => (
-                      <button
-                        key={category}
-                        className={`chip ${
-                          index === 0 ? "chip-primary" : "chip-soft"
-                        } ${index !== 0 ? "!border-transparent !bg-transparent" : ""}`}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    <Link className="action-ghost !border-transparent !px-3" to="/login">
-                      Sign in
-                    </Link>
-                    <Link className="action-secondary" to="/create-account">
-                      Join now
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </header>
-
             <section className="grid gap-6 lg:grid-cols-2">
               {markets.map((market) => (
                 <article

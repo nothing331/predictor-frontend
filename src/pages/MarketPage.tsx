@@ -39,10 +39,10 @@ export default function MarketPage() {
             <BrandMark caption="Live probability board" />
 
             <div className="flex flex-1 flex-col gap-5 xl:max-w-5xl xl:flex-row xl:items-center xl:justify-end">
-              <label className="app-panel-subtle field-shell flex-1">
+              <label className="app-panel-subtle field-shell search-shell flex-1">
                 <span className="material-symbols-outlined">search</span>
                 <input
-                  className="app-input uppercase"
+                  className="app-input search-input uppercase"
                   placeholder="Search markets, creators, or topics"
                   type="text"
                 />
