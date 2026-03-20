@@ -65,3 +65,5 @@ The app uses a **Neubrutalist** aesthetic defined in `src/index.css`:
 - **Utilities**: `.neubrutal-border`, `.neubrutalist-shadow`, `.slanted-display`, `.vertical-text`
 - **Typography**: Space Grotesk (display) · Space Mono (mono)
 - **Borders**: All radii set to `0px` for the brutalist squared-off look
+
+yello
