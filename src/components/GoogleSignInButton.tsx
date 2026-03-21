@@ -4,9 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { loginWithGoogle } from "../api/auth";
 import { ErrorStore } from "../store/errorStore";
 import { AuthStore } from "../store/authStore";
+import { decodeJwtPayload, normalizeProfile } from "../utils/auth";
 import { normalizeAppError } from "../utils/error";
 
 type Props = { label?: string };
+
+type GoogleCredentialPayload = {
+  email?: string;
+  name?: string;
+};
 
 export default function GoogleSignInButton({ label }: Props) {
   const saveAuth = AuthStore((state) => state.saveAuth);
@@ -27,10 +33,17 @@ export default function GoogleSignInButton({ label }: Props) {
 
           try {
             const tokens = await loginWithGoogle(credentialResponse.credential);
+            const googleProfile = decodeJwtPayload<GoogleCredentialPayload>(
+              credentialResponse.credential,
+            );
             saveAuth(
-              tokens.access_token,
-              tokens.refresh_token,
-              tokens.expires_in,
+              tokens.accessToken,
+              tokens.refreshToken,
+              tokens.expiresInSeconds,
+              normalizeProfile({
+                email: googleProfile?.email,
+                name: googleProfile?.name,
+              }),
             );
             navigate("/", { replace: true });
           } catch (error) {

@@ -359,6 +359,86 @@ a {
   color: var(--text-strong);
 }
 
+.profile-chip {
+  align-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 84%, white 16%),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+  border: 1px solid var(--border-soft);
+  display: inline-flex;
+  gap: 0.85rem;
+  max-width: 100%;
+  min-height: 4rem;
+  padding: 0.45rem 1rem 0.45rem 0.45rem;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.profile-chip:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--border-soft));
+  box-shadow: var(--shadow-soft);
+  transform: translate(3px, 3px);
+}
+
+.profile-chip-compact {
+  justify-content: center;
+  padding-right: 0.45rem;
+  width: 100%;
+}
+
+.profile-avatar {
+  align-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 72%, var(--color-secondary))
+    );
+  border: 2px solid var(--border-strong);
+  box-shadow: var(--shadow-soft);
+  color: #16130f;
+  display: inline-flex;
+  flex: none;
+  font-family: var(--font-display);
+  font-size: var(--step-20);
+  font-weight: 700;
+  height: 3rem;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  width: 3rem;
+}
+
+.profile-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.profile-meta strong {
+  font-family: var(--font-body);
+  font-size: var(--step-16);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.profile-meta span {
+  color: var(--text-muted);
+  font-size: var(--step-12);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .chip {
   align-items: center;
   border: 2px solid var(--border-strong);

@@ -2,16 +2,24 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export interface AuthProfile {
+  name: string;
+  email?: string | null;
+}
+
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   expiresAt: number | null;
+  profile: AuthProfile | null;
 
   saveAuth: (
     accessToken: string,
     refreshToken: string,
     expiresInSeconds: number,
+    profile?: AuthProfile | null,
   ) => void;
+  saveProfile: (profile: AuthProfile | null) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
 }
@@ -22,17 +30,26 @@ export const AuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       expiresAt: null,
+      profile: null,
 
-      saveAuth: (accessToken, refreshToken, expiresInSeconds) => {
+      saveAuth: (accessToken, refreshToken, expiresInSeconds, profile) => {
         set({
           accessToken,
           refreshToken,
           expiresAt: Date.now() + expiresInSeconds * 1000,
+          profile: profile !== undefined ? profile : get().profile,
         });
       },
 
+      saveProfile: (profile) => set({ profile }),
+
       logout: () =>
-        set({ accessToken: null, refreshToken: null, expiresAt: null }),
+        set({
+          accessToken: null,
+          refreshToken: null,
+          expiresAt: null,
+          profile: null,
+        }),
 
       isAuthenticated: () => {
         const { accessToken, expiresAt } = get();
@@ -45,6 +62,7 @@ export const AuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         expiresAt: state.expiresAt,
+        profile: state.profile,
       }),
     },
   ),
