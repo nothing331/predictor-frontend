@@ -12,6 +12,7 @@ export function normalizeAppError(
 ): NormalizedAppError {
   if (axios.isAxiosError(error)) {
     const apiMessage =
+      error.response?.data?.error ||
       error.response?.data?.message ||
       error.response?.data?.detail ||
       error.message;

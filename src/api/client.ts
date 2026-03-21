@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ErrorStore } from "../store/errorStore";
 import { normalizeAppError } from "../utils/error";
+import { AuthStore } from "@/store/authStore";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -24,3 +25,12 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+apiClient.interceptors.request.use((config) => {
+  const token = AuthStore.getState().accessToken;
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});

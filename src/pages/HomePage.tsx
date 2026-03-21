@@ -1,54 +1,9 @@
+import { useEffect, useState } from "react";
 import BrandMark from "../components/BrandMark";
 import HeaderAccountActions from "../components/HeaderAccountActions";
-
-const categories = ["All", "Politics", "Tech", "Sports", "Crypto"];
-
-const markets = [
-  {
-    category: "Tech",
-    title: "Will OpenAI announce GPT-5 before June 2025?",
-    volume: "$2.4M vol",
-    marketCount: "86 markets",
-    icon: "neurology",
-    outcomes: [
-      { icon: "smart_toy", label: "OpenAI", odds: "1.47x", probability: "68%", accent: "bg-primary" },
-      { icon: "schedule", label: "Delay", odds: "3.12x", probability: "32%", accent: "bg-secondary" },
-    ],
-  },
-  {
-    category: "Politics",
-    title: "Who will win the next presidential election cycle?",
-    volume: "$18.9M vol",
-    marketCount: "112 markets",
-    icon: "ballot",
-    outcomes: [
-      { icon: "how_to_vote", label: "Reform Bloc", odds: "2.38x", probability: "42%", accent: "bg-secondary" },
-      { icon: "account_balance", label: "Status Quo", odds: "1.72x", probability: "58%", accent: "bg-primary" },
-    ],
-  },
-  {
-    category: "Sports",
-    title: "Will the Lakers make the playoffs this season?",
-    volume: "$500K vol",
-    marketCount: "39 markets",
-    icon: "sports_basketball",
-    outcomes: [
-      { icon: "sports_score", label: "Yes", odds: "6.67x", probability: "15%", accent: "bg-primary" },
-      { icon: "block", label: "No", odds: "1.18x", probability: "85%", accent: "bg-secondary" },
-    ],
-  },
-  {
-    category: "Crypto",
-    title: "Will Bitcoin print a new all-time high this quarter?",
-    volume: "$8.7M vol",
-    marketCount: "54 markets",
-    icon: "currency_bitcoin",
-    outcomes: [
-      { icon: "trending_up", label: "Breakout", odds: "2.04x", probability: "49%", accent: "bg-primary" },
-      { icon: "trending_flat", label: "Rangebound", odds: "1.96x", probability: "51%", accent: "bg-secondary" },
-    ],
-  },
-];
+import CreateMarketDock from "../components/CreateMarketDock";
+import { toHomeMarketCard } from "../features/markets/homeMarketMapper";
+import { useMarkets } from "../hooks/useMarkets";
 
 const tradeHistory = [
   {
@@ -75,6 +30,43 @@ const tradeHistory = [
 ];
 
 export default function HomePage() {
+  const { data: markets = [], isLoading, isError, refetch } = useMarkets("OPEN");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [search, setSearch] = useState("");
+  const cards = markets
+    .map(toHomeMarketCard)
+    .filter(
+      (market) => activeCategory === "All" || market.category === activeCategory,
+    )
+    .filter((market) => {
+      const searchValue = search.trim().toLowerCase();
+
+      if (!searchValue) {
+        return true;
+      }
+
+      return [market.title, market.category, ...market.outcomes.map((outcome) => outcome.label)]
+        .join(" ")
+        .toLowerCase()
+        .includes(searchValue);
+    });
+  const categories = [
+    "All",
+    ...Array.from(
+      new Set(
+        markets
+          .map((market) => market.category?.trim() || "General")
+          .filter(Boolean),
+      ),
+    ),
+  ];
+
+  useEffect(() => {
+    if (activeCategory !== "All" && !categories.includes(activeCategory)) {
+      setActiveCategory("All");
+    }
+  }, [activeCategory, categories]);
+
   return (
     <div className="page-shell">
       <div className="page-content">
@@ -89,16 +81,24 @@ export default function HomePage() {
                   className="app-input search-input uppercase"
                   placeholder="Search markets, creators, or topics"
                   type="text"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
                 />
               </label>
 
               <div className="flex flex-wrap gap-2">
-                {categories.map((category, index) => (
+                {categories.map((category) => (
                   <button
                     key={category}
                     className={`chip ${
-                      index === 0 ? "chip-primary" : "chip-soft"
-                    } ${index !== 0 ? "!border-transparent !bg-transparent" : ""}`}
+                      activeCategory === category ? "chip-primary" : "chip-soft"
+                    } ${
+                      activeCategory === category
+                        ? ""
+                        : "!border-transparent !bg-transparent"
+                    }`}
+                    type="button"
+                    onClick={() => setActiveCategory(category)}
                   >
                     {category}
                   </button>
@@ -112,47 +112,56 @@ export default function HomePage() {
 
         <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_320px]">
           <main className="min-w-0">
-            <section className="grid gap-6 lg:grid-cols-2">
-              {markets.map((market) => (
-                <article
-                  key={market.title}
-                  className="app-panel-subtle flex h-full flex-col justify-between px-5 py-6 md:px-7 md:py-7"
-                >
-                  <div className="min-w-0">
-                    <div className="mb-6 flex items-start justify-between gap-4">
-                      <div className="flex min-w-0 items-start gap-4">
-                        <span
-                          className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-primary text-[#16130f]"
-                        >
-                          <span className="material-symbols-outlined text-[1.5rem]">
-                            {market.icon}
-                          </span>
-                        </span>
+            {isLoading ? <MarketBoardSkeleton /> : null}
 
-                        <div className="min-w-0">
-                          <p className="eyebrow mb-2">{market.category}</p>
-                          <h2 className="type-heading-md">
-                            {market.title}
-                          </h2>
+            {isError ? <MarketBoardError onRetry={() => refetch()} /> : null}
+
+            {!isLoading && !isError && cards.length === 0 ? (
+              <MarketBoardEmpty
+                hasActiveFilters={activeCategory !== "All" || !!search.trim()}
+              />
+            ) : null}
+
+            {!isLoading && !isError && cards.length > 0 ? (
+              <section className="grid gap-6 lg:grid-cols-2">
+                {cards.map((market) => (
+                  <article
+                    key={market.id}
+                    className="app-panel-subtle flex h-full flex-col justify-between px-5 py-6 md:px-7 md:py-7"
+                  >
+                    <div className="min-w-0">
+                      <div className="mb-6 flex items-start justify-between gap-4">
+                        <div className="flex min-w-0 items-start gap-4">
+                          <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-primary text-[#16130f]">
+                            <span className="material-symbols-outlined text-[1.5rem]">
+                              {market.icon}
+                            </span>
+                          </span>
+
+                          <div className="min-w-0">
+                            <p className="eyebrow mb-2">{market.category}</p>
+                            <h2 className="type-heading-md">{market.title}</h2>
+                          </div>
                         </div>
+
+                        <span className="eyebrow whitespace-nowrap">
+                          {market.statusLabel}
+                        </span>
                       </div>
 
-                      <span className="eyebrow whitespace-nowrap">Live market</span>
-                    </div>
-
-                    <div className="space-y-4">
-                      {market.outcomes.map((outcome) => (
-                        <div
-                          key={`${market.title}-${outcome.label}`}
-                          className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4"
-                        >
-                          <span
-                            className="flex h-10 w-10 items-center justify-center rounded-full text-[color:var(--text-muted)]"
-                            style={{
-                              background:
-                                "color-mix(in srgb, var(--surface-soft) 78%, transparent)",
-                            }}
+                      <div className="space-y-4">
+                        {market.outcomes.map((outcome) => (
+                          <div
+                            key={`${market.id}-${outcome.id}`}
+                            className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4"
                           >
+                            <span
+                              className="flex h-10 w-10 items-center justify-center rounded-full text-[color:var(--text-muted)]"
+                              style={{
+                                background:
+                                  "color-mix(in srgb, var(--surface-soft) 78%, transparent)",
+                              }}
+                            >
                               <span className="material-symbols-outlined text-[1.25rem]">
                                 {outcome.icon}
                               </span>
@@ -167,26 +176,29 @@ export default function HomePage() {
                                   {outcome.odds}
                                 </span>
                               </div>
-                            <div
-                              className={`mt-2 h-[2px] w-14 rounded-full ${outcome.accent}`}
-                            />
+                              <div
+                                className={`mt-2 h-[2px] w-14 rounded-full ${outcome.accent}`}
+                              />
+                            </div>
+
+                            <button className="chip chip-soft !border-[var(--border-soft)] !bg-transparent !px-3">
+                              {outcome.probability}
+                            </button>
                           </div>
-
-                          <button className="chip chip-soft !border-[var(--border-soft)] !bg-transparent !px-3">
-                            {outcome.probability}
-                          </button>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="section-divider type-body-sm mt-8 flex items-center justify-between gap-4 pt-4">
-                    <span className="muted-copy">{market.volume}</span>
-                    <span className="muted-copy">{market.marketCount}</span>
-                  </div>
-                </article>
-              ))}
-            </section>
+                    <div className="section-divider type-body-sm mt-8 flex items-center justify-between gap-4 pt-4">
+                      <span className="muted-copy">{market.volume}</span>
+                      <span className="muted-copy">{market.statusLabel}</span>
+                    </div>
+                  </article>
+                ))}
+              </section>
+            ) : null}
+
+            <CreateMarketDock categorySuggestions={categories.filter((category) => category !== "All")} />
           </main>
 
           <aside className="xl:sticky xl:top-6 xl:self-start">
@@ -236,5 +248,66 @@ export default function HomePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function MarketBoardSkeleton() {
+  return (
+    <section className="grid gap-6 lg:grid-cols-2">
+      {Array.from({ length: 4 }, (_, index) => (
+        <article
+          key={index}
+          className="market-state-card app-panel-subtle animate-pulse px-5 py-6 md:px-7 md:py-7"
+        >
+          <div className="market-state-block h-4 w-24" />
+          <div className="market-state-block mt-5 h-16 w-full" />
+          <div className="market-state-block mt-8 h-14 w-full" />
+          <div className="market-state-block mt-4 h-14 w-full" />
+          <div className="market-state-block mt-8 h-4 w-40" />
+        </article>
+      ))}
+    </section>
+  );
+}
+
+function MarketBoardError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <section className="market-state-card app-panel-subtle px-6 py-7 md:px-8 md:py-8">
+      <p className="eyebrow">Board unavailable</p>
+      <h2 className="type-heading-sm mt-3 uppercase">
+        We could not load open markets
+      </h2>
+      <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
+        The live market feed did not return a usable response. Retry to fetch
+        the current board again.
+      </p>
+      <button className="action-secondary mt-6" type="button" onClick={onRetry}>
+        Retry feed
+      </button>
+    </section>
+  );
+}
+
+function MarketBoardEmpty({
+  hasActiveFilters,
+}: {
+  hasActiveFilters: boolean;
+}) {
+  return (
+    <section className="market-state-card app-panel-subtle px-6 py-7 md:px-8 md:py-8">
+      <p className="eyebrow">
+        {hasActiveFilters ? "No match found" : "No open markets"}
+      </p>
+      <h2 className="type-heading-sm mt-3 uppercase">
+        {hasActiveFilters
+          ? "Nothing matches this board filter"
+          : "The board is waiting for its next launch"}
+      </h2>
+      <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
+        {hasActiveFilters
+          ? "Try another search term or switch back to All categories to widen the feed."
+          : "Create a new market from the launchpad below and it will appear here once the backend accepts it."}
+      </p>
+    </section>
   );
 }
