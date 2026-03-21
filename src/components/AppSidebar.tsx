@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import BrandMark from "./BrandMark";
+import { AuthStore } from "../store/authStore";
+import { isSessionAuthenticated } from "../utils/auth";
+import UserProfileBadge from "./UserProfileBadge";
 
-const navItems = [
+const primaryNavItems = [
   { icon: "grid_view", label: "Markets", to: "/" },
   { icon: "candlestick_chart", label: "Live Market", to: "/market" },
-  { icon: "login", label: "Sign In", to: "/login" },
-  { icon: "person_add", label: "Join", to: "/create-account" },
 ];
 
 type AppSidebarProps = {
@@ -14,18 +15,21 @@ type AppSidebarProps = {
 };
 
 export default function AppSidebar({ footer }: AppSidebarProps) {
+  const accessToken = AuthStore((state) => state.accessToken);
+  const expiresAt = AuthStore((state) => state.expiresAt);
+  const profile = AuthStore((state) => state.profile);
+  const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const navItems = isAuthenticated
+    ? primaryNavItems
+    : [
+        ...primaryNavItems,
+        { icon: "login", label: "Sign In", to: "/login" },
+        { icon: "person_add", label: "Join", to: "/create-account" },
+      ];
+
   return (
     <aside className="app-panel app-panel-strong flex h-full flex-col gap-8 p-5 lg:sticky lg:top-6 lg:min-h-[calc(100vh-3rem)]">
       <BrandMark />
-
-      {/* <div className="app-panel app-panel-soft p-4">
-        <p className="eyebrow mb-3">Daily Brief</p>
-        <p className="type-body-lg font-semibold leading-relaxed">
-          Track momentum, place fast positions, and keep every market in one
-          coordinated desk.
-        </p>
-      </div> */}
-
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => (
           <NavLink
@@ -41,6 +45,8 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
           </NavLink>
         ))}
       </nav>
+
+      {isAuthenticated ? <UserProfileBadge compact profile={profile} /> : null}
 
       <div className="mt-auto flex flex-col gap-4 border-t border-[var(--border-soft)] pt-6">
         <button className="action-secondary w-full">

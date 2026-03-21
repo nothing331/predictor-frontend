@@ -1,15 +1,19 @@
+import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import AuthScaffold from "../components/AuthScaffold";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { AuthStore } from "../store/authStore";
+import { isSessionAuthenticated, normalizeProfile } from "../utils/auth";
 
 export default function CreateAccountPage() {
   const navigate = useNavigate();
   const saveAuth = AuthStore((state) => state.saveAuth);
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
-  const isAuthenticated =
-    !!accessToken && !!expiresAt && Date.now() < expiresAt;
+  const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   if (isAuthenticated) {
     return <Navigate replace to="/" />;
@@ -26,7 +30,12 @@ export default function CreateAccountPage() {
           className="space-y-5"
           onSubmit={(event) => {
             event.preventDefault();
-            saveAuth("demo-access-token", "demo-refresh-token", 60 * 60 * 24);
+            saveAuth(
+              "demo-access-token",
+              "demo-refresh-token",
+              60 * 60 * 24,
+              normalizeProfile({ name: username, email }),
+            );
             navigate("/", { replace: true });
           }}
         >
@@ -38,6 +47,8 @@ export default function CreateAccountPage() {
                 className="app-input"
                 placeholder="Choose a handle"
                 type="text"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
               />
             </div>
           </label>
@@ -50,6 +61,8 @@ export default function CreateAccountPage() {
                 className="app-input"
                 placeholder="name@example.com"
                 type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </div>
           </label>
@@ -62,6 +75,8 @@ export default function CreateAccountPage() {
                 className="app-input"
                 placeholder="Create a secure password"
                 type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
               />
             </div>
           </label>

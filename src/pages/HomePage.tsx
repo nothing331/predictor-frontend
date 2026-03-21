@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
 import BrandMark from "../components/BrandMark";
-import { AuthStore } from "../store/authStore";
+import HeaderAccountActions from "../components/HeaderAccountActions";
 
 const categories = ["All", "Politics", "Tech", "Sports", "Crypto"];
 
@@ -76,11 +75,6 @@ const tradeHistory = [
 ];
 
 export default function HomePage() {
-  const accessToken = AuthStore((state) => state.accessToken);
-  const expiresAt = AuthStore((state) => state.expiresAt);
-  const isAuthenticated =
-    !!accessToken && !!expiresAt && Date.now() < expiresAt;
-
   return (
     <div className="page-shell">
       <div className="page-content">
@@ -111,16 +105,7 @@ export default function HomePage() {
                 ))}
               </div>
 
-              {!isAuthenticated ? (
-                <div className="flex flex-wrap gap-3">
-                  <Link className="action-ghost !border-transparent !px-3" to="/login">
-                    Sign in
-                  </Link>
-                  <Link className="action-secondary" to="/create-account">
-                    Join now
-                  </Link>
-                </div>
-              ) : null}
+              <HeaderAccountActions />
             </div>
           </div>
         </header>
