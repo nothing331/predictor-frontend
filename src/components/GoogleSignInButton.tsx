@@ -4,19 +4,27 @@ import { useNavigate } from "react-router-dom";
 import { loginWithGoogle } from "../api/auth";
 import { ErrorStore } from "../store/errorStore";
 import { AuthStore } from "../store/authStore";
-import { decodeJwtPayload, normalizeProfile } from "../utils/auth";
+import {
+  decodeJwtPayload,
+  normalizeProfile,
+  sanitizeRedirectPath,
+} from "../utils/auth";
 import { normalizeAppError } from "../utils/error";
 
-type Props = { label?: string };
+type Props = {
+  label?: string;
+  redirectTo?: string;
+};
 
 type GoogleCredentialPayload = {
   email?: string;
   name?: string;
 };
 
-export default function GoogleSignInButton({ label }: Props) {
+export default function GoogleSignInButton({ label, redirectTo }: Props) {
   const saveAuth = AuthStore((state) => state.saveAuth);
   const navigate = useNavigate();
+  const destination = sanitizeRedirectPath(redirectTo);
 
   return (
     <div className="w-full">
@@ -45,7 +53,7 @@ export default function GoogleSignInButton({ label }: Props) {
                 name: googleProfile?.name,
               }),
             );
-            navigate("/", { replace: true });
+            navigate(destination, { replace: true });
           } catch (error) {
             if (axios.isAxiosError(error)) {
               return;

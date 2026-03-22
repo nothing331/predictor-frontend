@@ -61,6 +61,14 @@ export function decodeJwtPayload<T>(token: string) {
   }
 }
 
+export function sanitizeRedirectPath(redirectTo?: string | null) {
+  if (!redirectTo || !redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+    return "/";
+  }
+
+  return redirectTo;
+}
+
 function deriveNameFromEmail(email?: string | null) {
   const localPart = email?.split("@")[0]?.trim();
 

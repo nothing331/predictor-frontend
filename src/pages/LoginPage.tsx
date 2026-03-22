@@ -1,21 +1,27 @@
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import AuthScaffold from "../components/AuthScaffold";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { AuthStore } from "../store/authStore";
-import { isSessionAuthenticated, normalizeProfile } from "../utils/auth";
+import {
+  isSessionAuthenticated,
+  normalizeProfile,
+  sanitizeRedirectPath,
+} from "../utils/auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const saveAuth = AuthStore((state) => state.saveAuth);
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const redirectPath = sanitizeRedirectPath(searchParams.get("redirectTo"));
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   if (isAuthenticated) {
-    return <Navigate replace to="/" />;
+    return <Navigate replace to={redirectPath} />;
   }
 
   return (
@@ -35,7 +41,7 @@ export default function LoginPage() {
               60 * 60 * 24,
               normalizeProfile({ name: username }),
             );
-            navigate("/", { replace: true });
+            navigate(redirectPath, { replace: true });
           }}
         >
           <label className="block">
@@ -84,7 +90,10 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-[var(--border-soft)]" />
         </div>
 
-        <GoogleSignInButton label="Continue with Google" />
+        <GoogleSignInButton
+          label="Continue with Google"
+          redirectTo={redirectPath}
+        />
 
         <p className="type-body-sm text-center text-[color:var(--text-muted)]">
           New to the desk?{" "}
