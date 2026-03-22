@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import BrandMark from "../components/BrandMark";
 import HeaderAccountActions from "../components/HeaderAccountActions";
 import CreateMarketDock from "../components/CreateMarketDock";
 import { toHomeMarketCard } from "../features/markets/homeMarketMapper";
+import { getMarketPath } from "../features/markets/marketRoutes";
 import { useMarkets } from "../hooks/useMarkets";
 
 const tradeHistory = [
@@ -125,9 +127,11 @@ export default function HomePage() {
             {!isLoading && !isError && cards.length > 0 ? (
               <section className="grid gap-6 lg:grid-cols-2">
                 {cards.map((market) => (
-                  <article
+                  <Link
                     key={market.id}
-                    className="app-panel-subtle flex h-full flex-col justify-between px-5 py-6 md:px-7 md:py-7"
+                    aria-label={`Open market ${market.title}`}
+                    className="app-panel-subtle flex h-full flex-col justify-between px-5 py-6 text-[inherit] no-underline transition-transform duration-200 hover:-translate-y-1 md:px-7 md:py-7"
+                    to={getMarketPath(market.id)}
                   >
                     <div className="min-w-0">
                       <div className="mb-6 flex items-start justify-between gap-4">
@@ -181,9 +185,15 @@ export default function HomePage() {
                               />
                             </div>
 
-                            <button className="chip chip-soft !border-[var(--border-soft)] !bg-transparent !px-3">
+                            <span
+                              className={`chip !px-3 ${
+                                outcome.id === "YES"
+                                  ? "chip-primary"
+                                  : "chip-secondary"
+                              }`}
+                            >
                               {outcome.probability}
-                            </button>
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -193,7 +203,7 @@ export default function HomePage() {
                       <span className="muted-copy">{market.volume}</span>
                       <span className="muted-copy">{market.statusLabel}</span>
                     </div>
-                  </article>
+                  </Link>
                 ))}
               </section>
             ) : null}
