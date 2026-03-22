@@ -32,10 +32,75 @@ export type CreateMarketResponse = {
   marketId: string;
 };
 
+export type CreateTradeRequest = {
+  outcome: "YES" | "NO";
+  amount: number;
+};
+
+export type CreateTradeResponse = {
+  status: string;
+  message: string;
+  tradeId: string;
+  sharesBought: number;
+  cost: number;
+  outcome: "YES" | "NO";
+};
+
+export type MarketHistoryPoint = {
+  timestamp: string;
+  yesProbability: number;
+  noProbability: number;
+  eventType: "INITIAL" | "TRADE" | "RESOLUTION";
+  tradeId?: string;
+  outcome?: "YES" | "NO";
+  sharesBought?: number;
+  cost?: number;
+};
+
+export type MarketHistoryResponse = {
+  marketId: string;
+  status: "OPEN" | "RESOLVED";
+  points: MarketHistoryPoint[];
+};
+
+export type GetMarketHistoryParams = {
+  from?: string;
+  to?: string;
+  limit?: number;
+};
+
 export async function getMarkets(status: "OPEN" | "RESOLVED" = "OPEN") {
   const { data } = await apiClient.get<MarketDto[]>("/v1/markets", {
     params: { status },
   });
+  return data;
+}
+
+export async function getMarketById(marketId: string) {
+  const { data } = await apiClient.get<MarketDto>(
+    `/v1/markets/${encodeURIComponent(marketId)}`,
+  );
+  return data;
+}
+
+export async function getMarketHistory(
+  marketId: string,
+  params?: GetMarketHistoryParams,
+) {
+  const { data } = await apiClient.get<MarketHistoryResponse>(
+    `/v1/markets/${encodeURIComponent(marketId)}/history`,
+    {
+      params,
+    },
+  );
+  return data;
+}
+
+export async function createTrade(marketId: string, payload: CreateTradeRequest) {
+  const { data } = await apiClient.post<CreateTradeResponse>(
+    `/v1/markets/${encodeURIComponent(marketId)}/trades`,
+    payload,
+  );
   return data;
 }
 

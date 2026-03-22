@@ -3,8 +3,10 @@ import { ErrorStore } from "../store/errorStore";
 import { normalizeAppError } from "../utils/error";
 import { AuthStore } from "@/store/authStore";
 
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: API_BASE_URL,
 });
 
 apiClient.interceptors.response.use(

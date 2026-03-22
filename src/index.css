@@ -467,6 +467,64 @@ a {
   color: var(--text-strong);
 }
 
+.trade-outcome-option {
+  align-items: center;
+  border: 2px solid var(--border-strong);
+  display: inline-flex;
+  font-family: var(--font-display);
+  font-size: var(--step-20);
+  font-weight: 700;
+  justify-content: space-between;
+  letter-spacing: 0.05em;
+  min-height: 4.4rem;
+  padding: 0.95rem 1rem;
+  text-transform: uppercase;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.trade-outcome-option:hover {
+  transform: translate(3px, 3px);
+}
+
+.trade-outcome-option-yes {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 86%, white 14%),
+      color-mix(in srgb, var(--color-primary) 72%, black 28%)
+    );
+  box-shadow: var(--shadow-soft);
+  color: #16130f;
+}
+
+.trade-outcome-option-no {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-secondary) 84%, white 16%),
+      color-mix(in srgb, var(--color-secondary) 74%, black 26%)
+    );
+  box-shadow: var(--shadow-soft);
+  color: #f4efe6;
+}
+
+.trade-outcome-option-idle {
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  border-color: var(--border-soft);
+  color: var(--text-muted);
+}
+
+.trade-outcome-option-price {
+  font-family: var(--font-body);
+  font-size: var(--step-16);
+  letter-spacing: 0.02em;
+}
+
 .metric-card {
   display: flex;
   flex-direction: column;
@@ -495,6 +553,24 @@ a {
   color: var(--text-muted);
 }
 
+.trade-amount-shell {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 88%, transparent),
+      color-mix(in srgb, var(--surface) 94%, transparent)
+    );
+  min-height: 4.5rem;
+}
+
+.trade-amount-prefix {
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: var(--step-28);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
 .app-input {
   background: transparent;
   border: 0;
@@ -511,6 +587,35 @@ a {
 .app-input::placeholder {
   color: var(--text-muted);
   text-transform: uppercase;
+}
+
+.trade-quick-fill {
+  align-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-soft) 84%, white 16%),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+  border: 1px solid var(--border-soft);
+  color: var(--text-strong);
+  display: inline-flex;
+  font-size: var(--step-12);
+  font-weight: 700;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  min-width: 4.75rem;
+  padding: 0.75rem 0.95rem;
+  text-transform: uppercase;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.trade-quick-fill:hover {
+  border-color: var(--border-strong);
+  transform: translate(2px, 2px);
 }
 
 .search-shell {
@@ -825,6 +930,163 @@ a {
   border: 2px solid var(--border-strong);
   overflow: hidden;
   position: relative;
+}
+
+.market-history-chart {
+  height: 100%;
+  width: 100%;
+}
+
+.market-history-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.market-history-signal,
+.market-history-meta {
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 8.25rem;
+  padding: 0.85rem 1rem;
+}
+
+.market-history-signal-yes {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 28%, transparent),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+}
+
+.market-history-signal-no {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-secondary) 22%, transparent),
+      color-mix(in srgb, var(--surface) 92%, transparent)
+    );
+}
+
+.market-history-meta {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-soft) 90%, white 10%),
+      color-mix(in srgb, var(--surface) 94%, transparent)
+    );
+}
+
+.market-history-signal-value,
+.market-history-meta-value {
+  font-family: var(--font-display);
+  font-size: var(--step-28);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.market-live-shell {
+  align-items: end;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.market-live-badge {
+  align-items: center;
+  border: 1px solid var(--border-soft);
+  display: inline-flex;
+  font-size: var(--step-12);
+  font-weight: 700;
+  gap: 0.55rem;
+  letter-spacing: 0.12em;
+  padding: 0.7rem 0.95rem;
+  text-transform: uppercase;
+}
+
+.market-live-dot {
+  border-radius: 999px;
+  display: inline-flex;
+  height: 0.65rem;
+  width: 0.65rem;
+}
+
+.market-live-badge-live {
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  color: var(--text-strong);
+}
+
+.market-live-badge-live .market-live-dot {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+.market-live-badge-warning {
+  background: color-mix(in srgb, var(--color-secondary) 18%, transparent);
+  color: var(--text-strong);
+}
+
+.market-live-badge-warning .market-live-dot {
+  background: var(--color-secondary);
+}
+
+.market-live-badge-loading,
+.market-live-badge-idle {
+  background: color-mix(in srgb, var(--surface-soft) 86%, transparent);
+  color: var(--text-strong);
+}
+
+.market-live-badge-loading .market-live-dot,
+.market-live-badge-idle .market-live-dot {
+  background: var(--text-muted);
+}
+
+.market-chart-state,
+.market-chart-loading {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.market-chart-loading {
+  gap: 1rem;
+}
+
+.market-chart-loading-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  height: 12rem;
+}
+
+.market-chart-loading-block {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--surface-strong) 86%, transparent),
+      color-mix(in srgb, var(--surface) 94%, transparent)
+    );
+  border: 1px solid var(--border-soft);
+  animation: chartPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes chartPulse {
+  from {
+    opacity: 0.5;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
 }
 
 .auth-stat {
