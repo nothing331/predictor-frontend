@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthStore } from "@/store/authStore";
-import { isSessionAuthenticated } from "@/utils/auth";
+import { isAdminSession, isSessionAuthenticated } from "@/utils/auth";
 import { useCreateMarket } from "@/hooks/useMarkets";
 
 type CreateMarketDockProps = {
@@ -32,7 +32,9 @@ export default function CreateMarketDock({
 }: CreateMarketDockProps) {
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const role = AuthStore((state) => state.role);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const isAdmin = isAdminSession(role);
   const createMarket = useCreateMarket();
   const [form, setForm] = useState<FormState>(initialFormState);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -50,6 +52,11 @@ export default function CreateMarketDock({
 
     if (!isAuthenticated) {
       setErrorMessage("Sign in to launch a new market.");
+      return;
+    }
+
+    if (!isAdmin) {
+      setErrorMessage("Admin access is required to launch a market.");
       return;
     }
 
@@ -142,6 +149,24 @@ export default function CreateMarketDock({
                 </Link>
                 <Link className="action-ghost" to="/create-account">
                   Join the desk
+                </Link>
+              </div>
+            </div>
+          ) : !isAdmin ? (
+            <div className="launchpad-guest app-panel-subtle">
+              <p className="eyebrow">Admin clearance</p>
+              <h3 className="type-heading-sm mt-3 uppercase">
+                Market launch is reserved for admins
+              </h3>
+              <p className="mt-4 max-w-xl text-[color:var(--text-muted)]">
+                Your session can browse and trade, but only desks with the ADMIN
+                role can publish new markets into the live board.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <span className="chip chip-soft">Read-only launchpad</span>
+                <Link className="action-ghost" to="/">
+                  Return to trade board
                 </Link>
               </div>
             </div>

@@ -46,6 +46,17 @@ export type CreateTradeResponse = {
   outcome: "YES" | "NO";
 };
 
+export type ResolveMarketRequest = {
+  outcomeId: "YES" | "NO";
+};
+
+export type ResolveMarketResponse = {
+  status: string;
+  message: string;
+  marketId: string;
+  resolvedOutcome: "YES" | "NO";
+};
+
 export type MarketHistoryPoint = {
   timestamp: string;
   yesProbability: number;
@@ -63,15 +74,46 @@ export type MarketHistoryResponse = {
   points: MarketHistoryPoint[];
 };
 
+export type MarketUserTradeDto = {
+  tradeId: string;
+  outcome: "YES" | "NO";
+  sharesBought: number;
+  cost: number;
+  tradedAt: string;
+};
+
+export type MarketUserPositionDto = {
+  userId: string;
+  marketId: string;
+  marketName: string;
+  marketStatus: "OPEN" | "RESOLVED";
+  resolvedOutcome: "YES" | "NO" | null;
+  currentYesChance: number;
+  currentNoChance: number;
+  yesSharesHeld: number;
+  noSharesHeld: number;
+  totalInvested: number;
+  totalYesInvested: number;
+  totalNoInvested: number;
+  firstTradeAt: string | null;
+  lastTradeAt: string | null;
+  projectedPayoutIfYes: number;
+  projectedPayoutIfNo: number;
+  realizedPayout: number | null;
+  realizedNetPnl: number | null;
+  tradeCount: number;
+  trades: MarketUserTradeDto[];
+};
+
 export type GetMarketHistoryParams = {
   from?: string;
   to?: string;
   limit?: number;
 };
 
-export async function getMarkets(status: "OPEN" | "RESOLVED" = "OPEN") {
+export async function getMarkets(status?: "OPEN" | "RESOLVED") {
   const { data } = await apiClient.get<MarketDto[]>("/v1/markets", {
-    params: { status },
+    params: status ? { status } : undefined,
   });
   return data;
 }
@@ -96,9 +138,27 @@ export async function getMarketHistory(
   return data;
 }
 
+export async function getCurrentUserMarketPosition(marketId: string) {
+  const { data } = await apiClient.get<MarketUserPositionDto>(
+    `/v1/markets/${encodeURIComponent(marketId)}/me`,
+  );
+  return data;
+}
+
 export async function createTrade(marketId: string, payload: CreateTradeRequest) {
   const { data } = await apiClient.post<CreateTradeResponse>(
     `/v1/markets/${encodeURIComponent(marketId)}/trades`,
+    payload,
+  );
+  return data;
+}
+
+export async function resolveMarket(
+  marketId: string,
+  payload: ResolveMarketRequest,
+) {
+  const { data } = await apiClient.post<ResolveMarketResponse>(
+    `/v1/markets/${encodeURIComponent(marketId)}/resolve`,
     payload,
   );
   return data;

@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { isAxiosError } from "axios";
 import { Link, useParams } from "react-router-dom";
-import type { MarketDto, MarketHistoryPoint, MarketOutcomeDto } from "@/api/market";
+import type {
+  MarketDto,
+  MarketHistoryPoint,
+  MarketOutcomeDto,
+  MarketUserPositionDto,
+} from "@/api/market";
 import MarketHistoryChart from "@/components/MarketHistoryChart";
 import {
   buildHistoryPointKey,
@@ -16,27 +21,33 @@ import {
   formatProbability,
   getCategoryIcon,
   getMarketCategory,
-  getOutcomeIcon,
 } from "@/features/markets/marketPresentation";
 import { toHistoryPointFromTradeEvent } from "@/features/markets/marketEvents";
 import {
   getMarketPath,
   parseMarketIdParam,
 } from "@/features/markets/marketRoutes";
+import { useMarketPosition } from "@/hooks/useAccount";
 import { useMarketEventStream } from "@/hooks/useMarketEventStream";
 import { useMarketHistory } from "@/hooks/useMarketHistory";
 import { useCreateTrade, useMarket } from "@/hooks/useMarkets";
 import { AuthStore } from "@/store/authStore";
 import { isSessionAuthenticated } from "@/utils/auth";
+import {
+  FCoinName,
+  FCoinSymbol,
+  formatFCoinAmount,
+  formatFCoinDelta,
+} from "@/utils/currency";
 import BrandMark from "../components/BrandMark";
 import HeaderAccountActions from "../components/HeaderAccountActions";
 
 const categories = ["All", "Politics", "Tech", "Sports", "Crypto"];
 const quickAmounts = [
-  { amount: 1, label: "+$1" },
-  { amount: 5, label: "+$5" },
-  { amount: 10, label: "+$10" },
-  { amount: 100, label: "+$100" },
+  { amount: 1, label: formatFCoinDelta(1, { maximumFractionDigits: 0 }) },
+  { amount: 5, label: formatFCoinDelta(5, { maximumFractionDigits: 0 }) },
+  { amount: 10, label: formatFCoinDelta(10, { maximumFractionDigits: 0 }) },
+  { amount: 100, label: formatFCoinDelta(100, { maximumFractionDigits: 0 }) },
 ];
 
 export default function MarketPage() {
@@ -52,13 +63,14 @@ export default function MarketPage() {
     isLoading,
     refetch,
   } = useMarket(marketId);
+  const marketPositionQuery = useMarketPosition(marketId);
   const [activeRange, setActiveRange] = useState<MarketHistoryRangePreset>("ALL");
   const {
     data: history,
     isError: isHistoryError,
     isLoading: isHistoryLoading,
     refetch: refetchHistory,
-  } = useMarketHistory(marketId, activeRange);
+  } = useMarketHistory(marketId, activeRange, market?.status === "OPEN");
   const tradeMutation = useCreateTrade(marketId);
   const [selectedOutcome, setSelectedOutcome] =
     useState<MarketOutcomeDto["outcomeId"] | null>(null);
@@ -157,6 +169,7 @@ export default function MarketPage() {
   }
 
   const category = getMarketCategory(market.category);
+  const isResolvedMarket = market.status === "RESOLVED";
   const marketIcon = getCategoryIcon(category);
   const descriptionBlocks = buildDescriptionBlocks(market);
   const leadOutcome = getLeadOutcome(market.outcomes);
@@ -178,12 +191,14 @@ export default function MarketPage() {
     isAuthenticated &&
     !!activeTradeOutcome &&
     amountValue > 0;
-  const chartStatus = getChartStatus({
-    hasHistory: combinedHistoryPoints.length > 0,
-    isHistoryLoading,
-    isStreamEnabled: streamEnabled,
-    streamStatus,
-  });
+  const chartStatus = isResolvedMarket
+    ? null
+    : getChartStatus({
+        hasHistory: combinedHistoryPoints.length > 0,
+        isHistoryLoading,
+        isStreamEnabled: streamEnabled,
+        streamStatus,
+      });
 
   return (
     <div className="page-shell">
@@ -221,7 +236,7 @@ export default function MarketPage() {
           </div>
         </header>
 
-        <main className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
+        <main className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_328px] 2xl:grid-cols-[minmax(0,1fr)_360px]">
           <section className="min-w-0 space-y-8">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
@@ -254,152 +269,103 @@ export default function MarketPage() {
               </div>
             </div>
 
-            <section className="app-panel-subtle overflow-hidden px-5 py-6 md:px-8 md:py-8">
-              <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-                <div className="space-y-3">
-                  <p className="eyebrow">Price history</p>
-                  <div className="market-history-summary">
-                    {market.outcomes.map((outcome) => (
-                      <article
-                        key={outcome.outcomeId}
-                        className={`market-history-signal ${
-                          outcome.outcomeId === "YES"
-                            ? "market-history-signal-yes"
-                            : "market-history-signal-no"
-                        }`}
-                      >
-                        <span className="eyebrow">{outcome.label}</span>
-                        <strong className="market-history-signal-value">
+            {isResolvedMarket ? (
+              <ResolvedMarketSummary
+                market={market}
+                resolvedLabel={resolvedLabel}
+              />
+            ) : (
+              <section className="app-panel-subtle overflow-hidden px-5 py-6 md:px-8 md:py-8">
+                <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-3">
+                    <p className="eyebrow">Price history</p>
+                    <div className="market-history-summary">
+                      {market.outcomes.map((outcome) => (
+                        <article
+                          key={outcome.outcomeId}
+                          className={`market-history-signal ${
+                            outcome.outcomeId === "YES"
+                              ? "market-history-signal-yes"
+                              : "market-history-signal-no"
+                          }`}
+                        >
+                          <span className="eyebrow">{outcome.label}</span>
+                          <strong className="market-history-signal-value">
+                            {latestHistoryPoint
+                              ? formatProbability(
+                                  outcome.outcomeId === "YES"
+                                    ? latestHistoryPoint.yesProbability
+                                    : latestHistoryPoint.noProbability,
+                                )
+                              : formatProbability(outcome.probability)}
+                          </strong>
+                        </article>
+                      ))}
+                      <article className="market-history-meta">
+                        <span className="eyebrow">Last update</span>
+                        <strong className="market-history-meta-value">
                           {latestHistoryPoint
-                            ? formatProbability(
-                                outcome.outcomeId === "YES"
-                                  ? latestHistoryPoint.yesProbability
-                                  : latestHistoryPoint.noProbability,
-                              )
-                            : formatProbability(outcome.probability)}
+                            ? formatRelativeTimestamp(latestHistoryPoint.timestamp)
+                            : "Waiting for history"}
                         </strong>
                       </article>
-                    ))}
-                    <article className="market-history-meta">
-                      <span className="eyebrow">Last update</span>
-                      <strong className="market-history-meta-value">
-                        {latestHistoryPoint
-                          ? formatRelativeTimestamp(latestHistoryPoint.timestamp)
-                          : "Waiting for history"}
-                      </strong>
-                    </article>
-                  </div>
-                </div>
-
-                <div className="market-live-shell">
-                  <span className={`market-live-badge ${chartStatus.toneClass}`}>
-                    <span className="market-live-dot" />
-                    {chartStatus.label}
-                  </span>
-                  <div className="flex items-center gap-3 text-[color:var(--text-muted)]">
-                    <span className="material-symbols-outlined">event</span>
-                    <span className="material-symbols-outlined">forum</span>
-                    <span className="material-symbols-outlined">ios_share</span>
-                    <span className="material-symbols-outlined">download</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="chart-surface h-80 w-full md:h-[26rem]">
-                {isHistoryLoading && !history ? (
-                  <ChartHistoryLoading />
-                ) : isHistoryError && !history ? (
-                  <ChartHistoryError onRetry={() => refetchHistory()} />
-                ) : combinedHistoryPoints.length > 0 ? (
-                  <MarketHistoryChart points={combinedHistoryPoints} />
-                ) : (
-                  <ChartHistoryEmpty />
-                )}
-              </div>
-
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-                <span className="muted-copy">
-                  {formatCompactCurrency(market.totalValue)} vol ·{" "}
-                  {combinedHistoryPoints.length} plotted points
-                </span>
-
-                <div className="flex flex-wrap gap-2">
-                  {marketHistoryRangeOptions.map((option) => (
-                    <button
-                      key={option.id}
-                      className={`chip ${
-                        activeRange === option.id
-                          ? "chip-primary"
-                          : "chip-soft !border-transparent !bg-transparent"
-                      }`}
-                      onClick={() => setActiveRange(option.id)}
-                      type="button"
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            <section className="app-panel-subtle overflow-hidden">
-              <div className="surface-line type-body-sm grid grid-cols-[minmax(0,1fr)_120px_150px_150px] gap-4 px-5 py-4 md:px-8">
-                <span className="eyebrow">Outcome</span>
-                <span className="eyebrow text-center">Chance</span>
-                <span className="eyebrow text-center">Buy yes</span>
-                <span className="eyebrow text-center">Buy no</span>
-              </div>
-
-              {market.outcomes.map((outcome, index) => (
-                <article
-                  key={outcome.outcomeId}
-                  className="surface-line last:border-b-0 grid grid-cols-[minmax(0,1fr)_120px_150px_150px] items-center gap-4 px-5 py-5 md:px-8"
-                >
-                  <div className="flex min-w-0 items-center gap-4">
-                    <span
-                      className="flex h-11 w-11 flex-none items-center justify-center rounded-full text-[color:var(--text-strong)]"
-                      style={{
-                        background:
-                          "color-mix(in srgb, var(--surface-soft) 78%, transparent)",
-                      }}
-                    >
-                      <span className="material-symbols-outlined text-[1.25rem]">
-                        {getOutcomeIcon(outcome.outcomeId, index)}
-                      </span>
-                    </span>
-
-                    <div className="min-w-0">
-                      <p className="type-body-lg truncate font-medium">
-                        {outcome.label}
-                      </p>
-                      <div
-                        className={`mt-2 h-[2px] w-14 rounded-full ${
-                          index === 0 ? "bg-primary" : "bg-secondary"
-                        }`}
-                      />
                     </div>
                   </div>
 
-                  <span className="type-heading-sm text-center font-mono font-semibold">
-                    {formatProbability(outcome.probability)}
+                  <div className="market-live-shell">
+                    <span className={`market-live-badge ${chartStatus?.toneClass ?? ""}`}>
+                      <span className="market-live-dot" />
+                      {chartStatus?.label ?? "Snapshot mode"}
+                    </span>
+                    <div className="flex items-center gap-3 text-[color:var(--text-muted)]">
+                      <span className="material-symbols-outlined">event</span>
+                      <span className="material-symbols-outlined">forum</span>
+                      <span className="material-symbols-outlined">ios_share</span>
+                      <span className="material-symbols-outlined">download</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="chart-surface h-80 w-full md:h-[26rem]">
+                  {isHistoryLoading && !history ? (
+                    <ChartHistoryLoading />
+                  ) : isHistoryError && !history ? (
+                    <ChartHistoryError onRetry={() => refetchHistory()} />
+                  ) : combinedHistoryPoints.length > 0 ? (
+                    <MarketHistoryChart points={combinedHistoryPoints} />
+                  ) : (
+                    <ChartHistoryEmpty />
+                  )}
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+                  <span className="muted-copy">
+                    {formatCompactCurrency(market.totalValue)} vol ·{" "}
+                    {combinedHistoryPoints.length} plotted points
                   </span>
 
-                  <button className="chip chip-primary justify-center !py-3" type="button">
-                    Yes {formatPrice(outcome.probability)}
-                  </button>
-
-                  <button
-                    className="chip chip-secondary justify-center !py-3"
-                    type="button"
-                  >
-                    No {formatPrice(1 - outcome.probability)}
-                  </button>
-                </article>
-              ))}
-            </section>
+                  <div className="flex flex-wrap gap-2">
+                    {marketHistoryRangeOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        className={`chip ${
+                          activeRange === option.id
+                            ? "chip-primary"
+                            : "chip-soft !border-transparent !bg-transparent"
+                        }`}
+                        onClick={() => setActiveRange(option.id)}
+                        type="button"
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
           </section>
 
-          <aside className="2xl:sticky 2xl:top-6 2xl:self-start">
+          <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
             <section className="app-panel-subtle overflow-hidden">
               <div className="px-5 py-6 md:px-6">
                 <div className="mb-5 flex items-start gap-4">
@@ -429,7 +395,7 @@ export default function MarketPage() {
                     </span>
                   </div>
                   <span className="eyebrow">
-                    {market.status === "OPEN" ? "Dollars" : resolvedLabel}
+                    {market.status === "OPEN" ? FCoinName : resolvedLabel}
                   </span>
                 </div>
 
@@ -458,7 +424,7 @@ export default function MarketPage() {
                 <label className="mb-5 block">
                   <span className="eyebrow mb-3 block">Amount</span>
                   <div className="app-panel-subtle field-shell trade-amount-shell">
-                    <span className="trade-amount-prefix">$</span>
+                    <span className="trade-amount-prefix">{FCoinSymbol}</span>
                     <input
                       className="app-input type-value-lg font-mono font-semibold"
                       inputMode="decimal"
@@ -490,8 +456,8 @@ export default function MarketPage() {
                 </div>
 
                 <p className="muted-copy mb-5 type-body-sm">
-                  The backend prices this as a budget order. Enter dollars, pick
-                  an outcome, and the server computes shares for you.
+                  The backend prices this as a budget order. Enter {FCoinName},
+                  pick an outcome, and the server computes shares for you.
                 </p>
 
                 {market.status !== "OPEN" ? (
@@ -543,6 +509,16 @@ export default function MarketPage() {
                 )}
               </div>
             </section>
+
+            <MarketPositionPanel
+              isAuthenticated={isAuthenticated}
+              market={market}
+              onRetry={() => marketPositionQuery.refetch()}
+              position={marketPositionQuery.data}
+              tradeDestination={tradeDestination}
+              isError={marketPositionQuery.isError}
+              isLoading={marketPositionQuery.isLoading}
+            />
           </aside>
         </main>
 
@@ -579,7 +555,7 @@ function MarketPageSkeleton() {
           </div>
         </header>
 
-        <main className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
+        <main className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_328px] 2xl:grid-cols-[minmax(0,1fr)_360px]">
           <section className="space-y-8">
             <div className="app-panel-subtle h-40 animate-pulse" />
             <div className="app-panel-subtle h-[34rem] animate-pulse" />
@@ -639,6 +615,312 @@ function MarketNotFound({ marketId }: { marketId?: string }) {
         </section>
       </div>
     </div>
+  );
+}
+
+function ResolvedMarketSummary({
+  market,
+  resolvedLabel,
+}: {
+  market: MarketDto;
+  resolvedLabel: string;
+}) {
+  return (
+    <section className="resolved-market-panel app-panel-subtle overflow-hidden px-5 py-6 md:px-8 md:py-8">
+      <div className="resolved-market-panel-hero">
+        <div>
+          <p className="eyebrow">Market closed</p>
+          <h2 className="type-heading-lg mt-3 uppercase">{resolvedLabel}</h2>
+          <p className="resolved-market-panel-copy">
+            This market has finished resolving, so the live chart and rolling
+            update feed are no longer shown on this screen.
+          </p>
+        </div>
+
+        <span className="market-status-pill market-status-pill-resolved">
+          Resolved market
+        </span>
+      </div>
+
+      <div className="resolved-market-summary">
+        {market.outcomes.map((outcome) => {
+          const isWinningOutcome = outcome.outcomeId === market.resolvedOutcome;
+
+          return (
+            <article
+              key={outcome.outcomeId}
+              className={`resolved-market-summary-card ${
+                isWinningOutcome ? "resolved-market-summary-card-winning" : ""
+              }`}
+            >
+              <span className="eyebrow">
+                {isWinningOutcome ? "Winning outcome" : "Closed outcome"}
+              </span>
+              <strong>{outcome.label}</strong>
+              <span>{formatProbability(outcome.probability)}</span>
+            </article>
+          );
+        })}
+
+        <article className="resolved-market-summary-card">
+          <span className="eyebrow">Settled volume</span>
+          <strong>{formatCompactCurrency(market.totalValue)}</strong>
+          <span>Total market volume recorded at close</span>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function MarketPositionPanel({
+  isAuthenticated,
+  isError,
+  isLoading,
+  market,
+  onRetry,
+  position,
+  tradeDestination,
+}: {
+  isAuthenticated: boolean;
+  isError: boolean;
+  isLoading: boolean;
+  market: MarketDto;
+  onRetry: () => void;
+  position?: MarketUserPositionDto;
+  tradeDestination: string;
+}) {
+  const hasExposure = hasMarketExposure(position);
+  const yesLabel = getOutcomeLabel(market, "YES");
+  const noLabel = getOutcomeLabel(market, "NO");
+  const isResolvedMarket = market.status === "RESOLVED";
+  const resolvedOutcomeLabel = market.resolvedOutcome
+    ? getOutcomeLabel(market, market.resolvedOutcome)
+    : "Awaiting resolution";
+  const realizedPayout = position?.realizedPayout ?? 0;
+  const realizedNetPnl = position?.realizedNetPnl ?? 0;
+  const resultToneClass =
+    realizedNetPnl > 0
+      ? "market-position-card-positive"
+      : realizedNetPnl < 0
+        ? "market-position-card-negative"
+        : "market-position-card-neutral";
+
+  if (!isAuthenticated) {
+    return (
+      <section className="market-position-panel app-panel-subtle overflow-hidden">
+        <div className="market-position-shell">
+          <div className="market-position-header">
+            <div>
+              <p className="eyebrow">Your market ledger</p>
+              <h2 className="type-heading-sm mt-3 uppercase">
+                Sign in to track this market
+              </h2>
+            </div>
+            <span className="market-position-status">Private desk view</span>
+          </div>
+
+          <p className="market-position-copy">
+            Once you enter the desk, this panel will show your invested {FCoinName},
+            outcome exposure, and payout view for this exact market.
+          </p>
+
+          <div className="market-position-grid">
+            <article className="market-position-card market-position-card-primary">
+              <span className="eyebrow">Track investment</span>
+              <strong>Live exposure</strong>
+              <span>See how much of your desk is riding on this market.</span>
+            </article>
+            <article className="market-position-card">
+              <span className="eyebrow">See settlement</span>
+              <strong>Clear payout view</strong>
+              <span>Know what each closing outcome would return to you.</span>
+            </article>
+          </div>
+
+          <Link
+            className="action-primary market-position-cta no-underline"
+            to={tradeDestination}
+          >
+            Sign in to unlock your ledger
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  if (isLoading && !position) {
+    return (
+      <section className="market-position-panel app-panel-subtle overflow-hidden">
+        <div className="market-position-shell">
+          <div className="market-position-loading">
+            <div className="market-position-loading-block h-4 w-36" />
+            <div className="market-position-loading-block h-16 w-full" />
+            <div className="market-position-loading-grid">
+              <div className="market-position-loading-block h-28 w-full" />
+              <div className="market-position-loading-block h-28 w-full" />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isError) {
+    return (
+      <section className="market-position-panel app-panel-subtle overflow-hidden">
+        <div className="market-position-shell">
+          <div className="market-position-header">
+            <div>
+              <p className="eyebrow">Your market ledger</p>
+              <h2 className="type-heading-sm mt-3 uppercase">
+                Position data is temporarily unavailable
+              </h2>
+            </div>
+            <span className="market-position-status">Retry needed</span>
+          </div>
+
+          <p className="market-position-copy">
+            The new market position endpoint did not return a usable response yet.
+            Retry this panel without losing the rest of the market screen.
+          </p>
+
+          <button className="action-secondary market-position-cta" onClick={onRetry} type="button">
+            Retry position data
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!position) {
+    return null;
+  }
+
+  return (
+    <section className="market-position-panel app-panel-subtle overflow-hidden">
+      <div className="market-position-shell">
+        <div className="market-position-header">
+          <div>
+            <p className="eyebrow">
+              {isResolvedMarket ? "Your settled slip" : "Your market ledger"}
+            </p>
+            <h2 className="type-heading-sm mt-3 uppercase">
+              {isResolvedMarket
+                ? hasExposure
+                  ? "Your position has closed"
+                  : "No position was booked here"
+                : hasExposure
+                  ? "Your exposure is live"
+                  : "No live position yet"}
+            </h2>
+          </div>
+          <span className="market-position-status">
+            {isResolvedMarket ? "Resolved market" : `${position.tradeCount} trade${position.tradeCount === 1 ? "" : "s"}`}
+          </span>
+        </div>
+
+        {isResolvedMarket ? (
+          <>
+            <div className="market-position-hero">
+              <span className="eyebrow">Settled payout</span>
+              <strong>{formatFCoinAmount(realizedPayout)}</strong>
+              <p>
+                {hasExposure
+                  ? `Resolved to ${resolvedOutcomeLabel}. This reflects the actual payout returned after settlement.`
+                  : "You did not hold a position when this market settled."}
+              </p>
+            </div>
+
+            <div className="market-position-grid">
+              <article className="market-position-card">
+                <span className="eyebrow">Total invested</span>
+                <strong>{formatFCoinAmount(position.totalInvested)}</strong>
+                <span>Combined cost basis across every fill in this market.</span>
+              </article>
+              <article className={`market-position-card ${resultToneClass}`}>
+                <span className="eyebrow">Net result</span>
+                <strong>{formatFCoinDelta(realizedNetPnl)}</strong>
+                <span>
+                  {realizedNetPnl > 0
+                    ? "You closed this market in profit."
+                    : realizedNetPnl < 0
+                      ? "This market settled below your cost basis."
+                      : "This market closed flat against your cost basis."}
+                </span>
+              </article>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="market-position-hero">
+              <span className="eyebrow">Current investment</span>
+              <strong>{formatFCoinAmount(position.totalInvested)}</strong>
+              <p>
+                {hasExposure
+                  ? `You are currently holding ${formatShareCount(position.yesSharesHeld + position.noSharesHeld)} across this market.`
+                  : "No orders have been filled here yet. Once you trade, this ledger will track your exposure and closing payout view."}
+              </p>
+            </div>
+
+            <div className="market-position-grid">
+              <article className="market-position-card market-position-card-primary">
+                <span className="eyebrow">{yesLabel} closes</span>
+                <strong>{formatFCoinAmount(position.projectedPayoutIfYes)}</strong>
+                <span>
+                  {formatShareCount(position.yesSharesHeld)} held ·{" "}
+                  {formatProbability(position.currentYesChance)} live chance
+                </span>
+              </article>
+              <article className="market-position-card">
+                <span className="eyebrow">{noLabel} closes</span>
+                <strong>{formatFCoinAmount(position.projectedPayoutIfNo)}</strong>
+                <span>
+                  {formatShareCount(position.noSharesHeld)} held ·{" "}
+                  {formatProbability(position.currentNoChance)} live chance
+                </span>
+              </article>
+            </div>
+          </>
+        )}
+
+        <div className="market-position-detail-grid">
+          <article className="market-position-metric">
+            <span className="eyebrow">Invested on {yesLabel}</span>
+            <strong>{formatFCoinAmount(position.totalYesInvested)}</strong>
+          </article>
+          <article className="market-position-metric">
+            <span className="eyebrow">Invested on {noLabel}</span>
+            <strong>{formatFCoinAmount(position.totalNoInvested)}</strong>
+          </article>
+          <article className="market-position-metric">
+            <span className="eyebrow">Last activity</span>
+            <strong>{formatLedgerTimestamp(position.lastTradeAt)}</strong>
+          </article>
+        </div>
+
+        <div className="market-position-footer">
+          <div>
+            <span className="eyebrow">Trade activity</span>
+            <p>
+              {position.tradeCount > 0
+                ? `${position.tradeCount} fill${position.tradeCount === 1 ? "" : "s"} since ${formatLedgerTimestamp(position.firstTradeAt)}`
+                : "No fills recorded on this market yet."}
+            </p>
+          </div>
+
+          {position.trades.length > 0 ? (
+            <div className="market-position-trade-stack">
+              {position.trades.slice(0, 2).map((trade) => (
+                <div key={trade.tradeId} className="market-position-trade-pill">
+                  <span>{getOutcomeLabel(market, trade.outcome)}</span>
+                  <strong>{formatFCoinAmount(trade.cost)}</strong>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -841,4 +1123,45 @@ function formatRelativeTimestamp(timestamp: string) {
     minute: "2-digit",
     month: "short",
   }).format(date);
+}
+
+function formatLedgerTimestamp(timestamp: string | null) {
+  if (!timestamp) {
+    return "No activity";
+  }
+
+  return formatRelativeTimestamp(timestamp);
+}
+
+function getOutcomeLabel(
+  market: MarketDto,
+  outcomeId: MarketOutcomeDto["outcomeId"],
+) {
+  return (
+    market.outcomes.find((outcome) => outcome.outcomeId === outcomeId)?.label ??
+    outcomeId
+  );
+}
+
+function hasMarketExposure(position?: MarketUserPositionDto) {
+  if (!position) {
+    return false;
+  }
+
+  return (
+    position.tradeCount > 0 ||
+    position.totalInvested > 0 ||
+    position.yesSharesHeld > 0 ||
+    position.noSharesHeld > 0
+  );
+}
+
+function formatShareCount(value: number) {
+  const shares = Number.isFinite(value) ? value : 0;
+  const formatted = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 3,
+    minimumFractionDigits: shares > 0 && shares < 1 ? 3 : 0,
+  }).format(shares);
+
+  return `${formatted} share${shares === 1 ? "" : "s"}`;
 }

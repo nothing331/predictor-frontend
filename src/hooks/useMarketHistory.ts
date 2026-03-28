@@ -8,9 +8,10 @@ import {
 export function useMarketHistory(
   marketId: string,
   rangePreset: MarketHistoryRangePreset,
+  enabled = true,
 ) {
   return useQuery({
-    enabled: !!marketId,
+    enabled: !!marketId && enabled,
     queryKey: ["market-history", marketId, rangePreset],
     queryFn: () => getMarketHistory(marketId, getMarketHistoryParams(rangePreset)),
   });
