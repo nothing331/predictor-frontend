@@ -2700,64 +2700,98 @@ a {
 }
 
 .site-bottom-bar {
-  align-items: center;
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: auto minmax(0, 1fr);
-  margin: 0 auto;
-  max-width: 720px;
-  padding: 0.8rem 0.95rem;
-}
-
-.site-bottom-bar-copy {
+  border-top: 1px solid var(--border-soft);
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.9rem;
+  margin: 0 auto;
+  max-width: 1400px;
+  padding: 1rem 0 0;
 }
 
-.site-bottom-bar-copy strong {
+.site-footer-top,
+.site-footer-bottom,
+.site-footer-inline,
+.site-footer-socials {
+  align-items: center;
+  display: flex;
+}
+
+.site-footer-top,
+.site-footer-bottom {
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.site-footer-inline,
+.site-footer-socials {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.site-footer-text-link,
+.site-footer-note,
+.site-footer-bottom p {
+  color: var(--text-muted);
+  font-size: var(--step-12);
+  letter-spacing: 0.05em;
+}
+
+.site-footer-text-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  text-transform: uppercase;
+  transition:
+    color 140ms ease,
+    opacity 140ms ease;
+}
+
+.site-footer-text-link:hover {
+  color: var(--text-strong);
+}
+
+.site-footer-divider {
+  background: color-mix(in srgb, var(--border-soft) 84%, transparent);
+  height: 0.85rem;
+  width: 1px;
+}
+
+.site-footer-social-link {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  justify-content: center;
+  opacity: 0.88;
+  transition:
+    color 140ms ease,
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.site-footer-social-link:hover {
+  color: var(--text-strong);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.site-footer-social-svg {
+  display: block;
+  height: 1rem;
+  width: 1rem;
+}
+
+.site-footer-bottom {
+  border-top: 1px solid color-mix(in srgb, var(--border-soft) 76%, transparent);
+  padding-top: 0.9rem;
+}
+
+.site-footer-bottom p:last-child {
   font-family: var(--font-display);
   font-size: var(--step-20);
   letter-spacing: 0.04em;
   line-height: 1;
   text-transform: uppercase;
-}
-
-.site-bottom-bar-actions {
-  display: flex;
-  gap: 0.7rem;
-  justify-content: end;
-}
-
-.site-bottom-bar-button {
-  align-items: center;
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--surface-soft) 86%, white 14%),
-      color-mix(in srgb, var(--surface) 96%, transparent)
-    );
-  border: 1px solid var(--border-soft);
-  color: var(--text-strong);
-  display: inline-flex;
-  gap: 0.6rem;
-  min-height: 2.8rem;
-  padding: 0.7rem 1rem;
-  text-transform: uppercase;
-  transition:
-    transform 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease;
-}
-
-.site-bottom-bar-button:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-soft);
-  transform: translateY(-1px);
-}
-
-.site-bottom-bar-button > .material-symbols-outlined {
-  font-size: 1.1rem;
 }
 
 .site-bottom-sheet-overlay {
@@ -3013,16 +3047,17 @@ a {
   }
 
   .site-bottom-bar {
-    grid-template-columns: 1fr;
+    align-items: start;
   }
 
-  .site-bottom-bar-actions {
-    justify-content: stretch;
+  .site-footer-top,
+  .site-footer-bottom {
+    align-items: start;
+    flex-direction: column;
   }
 
-  .site-bottom-bar-button {
-    flex: 1;
-    justify-content: center;
+  .site-footer-socials {
+    gap: 1rem;
   }
 
   .how-to-play-title {
