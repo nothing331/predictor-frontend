@@ -1,4 +1,5 @@
 import type { MarketOutcomeDto } from "@/api/market";
+import { formatFCoinAmount } from "@/utils/currency";
 
 const categoryIconMap: Record<string, string> = {
   Tech: "neurology",
@@ -51,16 +52,17 @@ export function formatOdds(probability: number) {
 }
 
 export function formatPrice(probability: number) {
-  return `${Math.round(clampProbability(probability) * 100)}c`;
+  return formatFCoinAmount(clampProbability(probability), {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
 }
 
 export function formatCompactCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    currency: "USD",
+  return formatFCoinAmount(value, {
+    compact: value >= 1000,
     maximumFractionDigits: value >= 1000 ? 1 : 2,
-    notation: value >= 1000 ? "compact" : "standard",
-    style: "currency",
-  }).format(value);
+  });
 }
 
 function clampProbability(probability: number) {
