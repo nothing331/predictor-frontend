@@ -1,6 +1,14 @@
-import type { AuthProfile } from "../store/authStore";
+import type { AuthProfile, AuthRole } from "../store/authStore";
 
 const fallbackProfileName = "Desk User";
+
+type NormalizableProfile = Partial<AuthProfile> & {
+  balance?: number | null;
+  email?: string | null;
+  name?: string | null;
+  pictureUrl?: string | null;
+  userId?: string | null;
+};
 
 export function isSessionAuthenticated(
   accessToken: string | null,
@@ -9,17 +17,44 @@ export function isSessionAuthenticated(
   return !!accessToken && !!expiresAt && Date.now() < expiresAt;
 }
 
-export function normalizeProfile(profile?: Partial<AuthProfile> | null) {
+export function hasApiBackedSession(accessToken: string | null) {
+  return !!accessToken && accessToken.split(".").length === 3;
+}
+
+export function getSessionRole(role?: string | null): AuthRole {
+  const normalizedRole = role?.trim().toUpperCase();
+
+  if (normalizedRole === "ADMIN" || normalizedRole === "USER") {
+    return normalizedRole;
+  }
+
+  return null;
+}
+
+export function isAdminSession(role?: string | null) {
+  return getSessionRole(role) === "ADMIN";
+}
+
+export function normalizeProfile(profile?: NormalizableProfile | null) {
+  const userId = profile?.userId?.trim();
   const name = profile?.name?.trim();
   const email = profile?.email?.trim();
+  const pictureUrl = profile?.pictureUrl?.trim();
+  const balance =
+    typeof profile?.balance === "number" && Number.isFinite(profile.balance)
+      ? profile.balance
+      : null;
 
-  if (!name && !email) {
+  if (!userId && !name && !email && !pictureUrl && balance === null) {
     return null;
   }
 
   return {
+    userId: userId || null,
     name: name || deriveNameFromEmail(email) || fallbackProfileName,
     email: email || null,
+    pictureUrl: pictureUrl || null,
+    balance,
   } satisfies AuthProfile;
 }
 

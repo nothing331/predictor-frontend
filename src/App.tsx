@@ -4,8 +4,11 @@ import LoginPage from "./pages/LoginPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
 import MarketPage from "./pages/MarketPage";
 import { MARKET_ROUTE_PATTERN } from "./features/markets/marketRoutes";
+import { useCurrentUserBootstrap } from "./hooks/useAccount";
 
 export default function App() {
+  useCurrentUserBootstrap();
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
