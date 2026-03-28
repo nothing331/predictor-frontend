@@ -8,7 +8,7 @@ import {
   isAdminSession,
   isSessionAuthenticated,
 } from "../utils/auth";
-import { FCoinName, formatFCoinAmount } from "../utils/currency";
+import { formatFCoinAmount } from "../utils/currency";
 import UserProfileBadge from "./UserProfileBadge";
 
 const primaryNavItems = [
@@ -72,7 +72,7 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
 
         {footer ?? (
           <div className="app-panel app-panel-soft p-4">
-            <p className="eyebrow mb-3">{FCoinName} Balance</p>
+            <p className="eyebrow mb-3">Balance</p>
             <div className="flex items-end justify-between gap-3">
               <div>
                 <p className="metric-value text-primary">
