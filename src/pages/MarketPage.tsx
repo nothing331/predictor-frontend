@@ -34,7 +34,6 @@ import { useCreateTrade, useMarket } from "@/hooks/useMarkets";
 import { AuthStore } from "@/store/authStore";
 import { isSessionAuthenticated } from "@/utils/auth";
 import {
-  FCoinName,
   FCoinSymbol,
   formatFCoinAmount,
   formatFCoinDelta,
@@ -390,12 +389,9 @@ export default function MarketPage() {
                     <button className="chip chip-primary" type="button">
                       {market.status === "OPEN" ? "Buy" : "Resolved"}
                     </button>
-                    <span className="chip chip-soft !border-transparent !bg-transparent">
-                      Budget order
-                    </span>
                   </div>
                   <span className="eyebrow">
-                    {market.status === "OPEN" ? FCoinName : resolvedLabel}
+                    {market.status === "OPEN" ? "" : resolvedLabel}
                   </span>
                 </div>
 
@@ -456,7 +452,7 @@ export default function MarketPage() {
                 </div>
 
                 <p className="muted-copy mb-5 type-body-sm">
-                  The backend prices this as a budget order. Enter {FCoinName},
+                  The backend prices this as a budget order. Enter amount,
                   pick an outcome, and the server computes shares for you.
                 </p>
 
@@ -720,14 +716,14 @@ function MarketPositionPanel({
           </div>
 
           <p className="market-position-copy">
-            Once you enter the desk, this panel will show your invested {FCoinName},
+            Once you enter the desk, this panel will show your invested amount,
             outcome exposure, and payout view for this exact market.
           </p>
 
           <div className="market-position-grid">
             <article className="market-position-card market-position-card-primary">
               <span className="eyebrow">Track investment</span>
-              <strong>Live exposure</strong>
+              <strong>Live market</strong>
               <span>See how much of your desk is riding on this market.</span>
             </article>
             <article className="market-position-card">

@@ -4,6 +4,7 @@ import BrandMark from "../components/BrandMark";
 import CreateMarketDock from "../components/CreateMarketDock";
 import GiftClaimRail from "../components/GiftClaimRail";
 import HeaderAccountActions from "../components/HeaderAccountActions";
+import HowToPlayDialog from "../components/HowToPlayDialog";
 import { useAccountSummary } from "../hooks/useAccount";
 import {
   toHomeMarketCard,
@@ -17,7 +18,7 @@ import {
   isAdminSession,
   isSessionAuthenticated,
 } from "../utils/auth";
-import { FCoinName, formatFCoinAmount } from "../utils/currency";
+import { formatFCoinAmount } from "../utils/currency";
 
 type HomeBoardMode = "TRADE" | "ADMIN";
 type ResolutionChoice = "YES" | "NO";
@@ -56,6 +57,7 @@ export default function HomePage() {
   const resolveMarketMutation = useResolveMarket();
   const [activeMode, setActiveMode] = useState<HomeBoardMode>("TRADE");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedResolutions, setSelectedResolutions] = useState<
     Record<string, ResolutionChoice>
@@ -237,16 +239,32 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-1 flex-col gap-4 xl:max-w-4xl xl:items-end">
-              <label className="app-panel-subtle field-shell search-shell flex-1 self-stretch xl:max-w-3xl">
-                <span className="material-symbols-outlined">search</span>
-                <input
-                  className="app-input search-input uppercase"
-                  placeholder={searchPlaceholder}
-                  type="text"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-              </label>
+              <div className="flex w-full flex-col gap-3 xl:max-w-3xl xl:flex-row xl:items-stretch">
+                <label className="app-panel-subtle field-shell search-shell flex-1">
+                  <span className="material-symbols-outlined">search</span>
+                  <input
+                    className="app-input search-input uppercase"
+                    placeholder={searchPlaceholder}
+                    type="text"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                  />
+                </label>
+
+                <button
+                  className="how-to-play-trigger"
+                  onClick={() => setIsHowToPlayOpen(true)}
+                  type="button"
+                >
+                  <span className="material-symbols-outlined">stadia_controller</span>
+                  <span>
+                    <span className="how-to-play-trigger-label">How to play</span>
+                    <span className="how-to-play-trigger-copy">
+                      Open game guide
+                    </span>
+                  </span>
+                </button>
+              </div>
 
               <div className="flex w-full flex-col gap-4 xl:flex-row xl:items-center xl:justify-end">
                 <div className="flex flex-wrap gap-2">
@@ -332,6 +350,11 @@ export default function HomePage() {
           </aside>
         </div>
       </div>
+
+      <HowToPlayDialog
+        isOpen={isHowToPlayOpen}
+        onClose={() => setIsHowToPlayOpen(false)}
+      />
     </div>
   );
 }
@@ -958,7 +981,7 @@ function GuestSignupRail() {
           <span className="material-symbols-outlined">savings</span>
           <div>
             <p className="type-body-md font-semibold">
-              Claim your free {FCoinName} balance
+              Claim your free balance
             </p>
             <p className="type-body-sm text-[color:var(--text-muted)]">
               Start funded instead of opening an empty shell.
