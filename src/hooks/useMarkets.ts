@@ -11,6 +11,7 @@ import {
 } from "@/api/market";
 import { AuthStore } from "@/store/authStore";
 import { ErrorStore } from "@/store/errorStore";
+import { attachAppErrorMeta } from "@/utils/error";
 import { isAdminSession } from "@/utils/auth";
 import { formatFCoinAmount } from "@/utils/currency";
 
@@ -35,7 +36,14 @@ export function useCreateMarket() {
   return useMutation({
     mutationFn: async (payload: CreateMarketRequest) => {
       if (!isAdminSession(AuthStore.getState().role)) {
-        throw new Error("Admin access is required to create markets.");
+        throw attachAppErrorMeta(
+          new Error("Admin access is required to create markets."),
+          {
+            errorMode: "silent",
+            isAuthFailure: false,
+            shouldToast: false,
+          },
+        );
       }
 
       return createMarket(payload);
@@ -80,7 +88,14 @@ export function useResolveMarket() {
   return useMutation({
     mutationFn: async ({ marketId, ...payload }: ResolveMarketMutationPayload) => {
       if (!isAdminSession(AuthStore.getState().role)) {
-        throw new Error("Admin access is required to resolve markets.");
+        throw attachAppErrorMeta(
+          new Error("Admin access is required to resolve markets."),
+          {
+            errorMode: "silent",
+            isAuthFailure: false,
+            shouldToast: false,
+          },
+        );
       }
 
       return resolveMarket(marketId, payload);

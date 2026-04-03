@@ -1,5 +1,4 @@
 import { GoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { loginWithGoogle } from "../api/auth";
 import { ErrorStore } from "../store/errorStore";
@@ -55,15 +54,15 @@ export default function GoogleSignInButton({ label, redirectTo }: Props) {
             );
             navigate(destination, { replace: true });
           } catch (error) {
-            if (axios.isAxiosError(error)) {
-              return;
-            }
-
             const normalized = normalizeAppError(
               error,
               "Authentication failed",
               "We could not sign you in with Google.",
             );
+
+            if (!normalized.shouldToast) {
+              return;
+            }
 
             ErrorStore.getState().pushToast({
               title: normalized.title,

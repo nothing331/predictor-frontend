@@ -1,5 +1,17 @@
 import { apiClient } from "./client";
 
+const protectedInlineRequestMeta = {
+  authMode: "required",
+  errorMode: "inline",
+  retryOn401: true,
+} as const;
+
+const protectedToastRequestMeta = {
+  authMode: "required",
+  errorMode: "toast",
+  retryOn401: true,
+} as const;
+
 export type AccountSummaryMarketDto = {
   marketId: string;
   marketName: string;
@@ -30,13 +42,19 @@ export type GiftClaimResponse = {
 };
 
 export async function getAccountSummary() {
-  const { data } = await apiClient.get<AccountSummaryDto>("/v1/users/me/summary");
+  const { data } = await apiClient.get<AccountSummaryDto>("/v1/users/me/summary", {
+    appMeta: protectedInlineRequestMeta,
+  });
   return data;
 }
 
 export async function claimGift() {
   const { data } = await apiClient.post<GiftClaimResponse>(
     "/v1/users/me/gift-claim",
+    undefined,
+    {
+      appMeta: protectedToastRequestMeta,
+    },
   );
   return data;
 }

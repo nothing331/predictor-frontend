@@ -1,5 +1,23 @@
 import { apiClient } from "./client";
 
+const publicInlineRequestMeta = {
+  authMode: "optional",
+  errorMode: "inline",
+  retryOn401: false,
+} as const;
+
+const protectedInlineRequestMeta = {
+  authMode: "required",
+  errorMode: "inline",
+  retryOn401: true,
+} as const;
+
+const protectedToastRequestMeta = {
+  authMode: "required",
+  errorMode: "toast",
+  retryOn401: true,
+} as const;
+
 // src/api/markets.ts
 export type MarketOutcomeDto = {
   outcomeId: "YES" | "NO";
@@ -114,6 +132,7 @@ export type GetMarketHistoryParams = {
 export async function getMarkets(status?: "OPEN" | "RESOLVED") {
   const { data } = await apiClient.get<MarketDto[]>("/v1/markets", {
     params: status ? { status } : undefined,
+    appMeta: publicInlineRequestMeta,
   });
   return data;
 }
@@ -121,6 +140,9 @@ export async function getMarkets(status?: "OPEN" | "RESOLVED") {
 export async function getMarketById(marketId: string) {
   const { data } = await apiClient.get<MarketDto>(
     `/v1/markets/${encodeURIComponent(marketId)}`,
+    {
+      appMeta: publicInlineRequestMeta,
+    },
   );
   return data;
 }
@@ -132,6 +154,7 @@ export async function getMarketHistory(
   const { data } = await apiClient.get<MarketHistoryResponse>(
     `/v1/markets/${encodeURIComponent(marketId)}/history`,
     {
+      appMeta: publicInlineRequestMeta,
       params,
     },
   );
@@ -141,6 +164,9 @@ export async function getMarketHistory(
 export async function getCurrentUserMarketPosition(marketId: string) {
   const { data } = await apiClient.get<MarketUserPositionDto>(
     `/v1/markets/${encodeURIComponent(marketId)}/me`,
+    {
+      appMeta: protectedInlineRequestMeta,
+    },
   );
   return data;
 }
@@ -149,6 +175,9 @@ export async function createTrade(marketId: string, payload: CreateTradeRequest)
   const { data } = await apiClient.post<CreateTradeResponse>(
     `/v1/markets/${encodeURIComponent(marketId)}/trades`,
     payload,
+    {
+      appMeta: protectedToastRequestMeta,
+    },
   );
   return data;
 }
@@ -160,11 +189,24 @@ export async function resolveMarket(
   const { data } = await apiClient.post<ResolveMarketResponse>(
     `/v1/markets/${encodeURIComponent(marketId)}/resolve`,
     payload,
+    {
+      appMeta: protectedToastRequestMeta,
+    },
   );
   return data;
 }
 
 export async function createMarket(payload: CreateMarketRequest) {
-  const { data } = await apiClient.post<CreateMarketResponse>("/v1/markets", payload);
+  const { data } = await apiClient.post<CreateMarketResponse>(
+    "/v1/markets",
+    payload,
+    {
+      appMeta: {
+        authMode: "required",
+        errorMode: "inline",
+        retryOn401: true,
+      },
+    },
+  );
   return data;
 }

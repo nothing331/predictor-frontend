@@ -15,20 +15,56 @@ interface ErrorStoreState {
   dismissToast: (id: string) => void;
 }
 
-export const ErrorStore = create<ErrorStoreState>((set) => ({
+const TOAST_LIFETIME_MS = 5000;
+const TOAST_DEDUPE_WINDOW_MS = 4000;
+const MAX_ACTIVE_TOASTS = 4;
+
+const recentToastTimestamps = new Map<string, number>();
+
+function getToastKey(toast: Omit<ErrorToast, "id"> | ErrorToast) {
+  return [toast.tone, toast.title.trim(), toast.message.trim()].join("::");
+}
+
+function pruneRecentToasts(now: number) {
+  recentToastTimestamps.forEach((timestamp, key) => {
+    if (now - timestamp > TOAST_LIFETIME_MS) {
+      recentToastTimestamps.delete(key);
+    }
+  });
+}
+
+export const ErrorStore = create<ErrorStoreState>((set, get) => ({
   toasts: [],
   pushToast: (toast) => {
+    const now = Date.now();
+    const toastKey = getToastKey(toast);
+    pruneRecentToasts(now);
+
+    const activeDuplicate = get()
+      .toasts
+      .find((item) => getToastKey(item) === toastKey);
+
+    if (activeDuplicate) {
+      return activeDuplicate.id;
+    }
+
+    const lastShownAt = recentToastTimestamps.get(toastKey);
+    if (lastShownAt && now - lastShownAt < TOAST_DEDUPE_WINDOW_MS) {
+      return `suppressed-${now}`;
+    }
+
+    recentToastTimestamps.set(toastKey, now);
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     set((state) => ({
-      toasts: [...state.toasts, { ...toast, id }],
+      toasts: [...state.toasts, { ...toast, id }].slice(-MAX_ACTIVE_TOASTS),
     }));
 
     window.setTimeout(() => {
       set((state) => ({
         toasts: state.toasts.filter((item) => item.id !== id),
       }));
-    }, 5000);
+    }, TOAST_LIFETIME_MS);
 
     return id;
   },
