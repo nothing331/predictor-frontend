@@ -54,18 +54,7 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
           Create Market
         </button>
 
-        {footer ?? (
-          <div className="app-panel app-panel-soft p-4">
-            <p className="eyebrow mb-3">Desk Balance</p>
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="metric-value text-primary">$12.45K</p>
-                <p className="muted-copy type-body-sm">24 open positions</p>
-              </div>
-              <span className="chip chip-soft">+8.4% week</span>
-            </div>
-          </div>
-        )}
+        {footer ?? null}
       </div>
     </aside>
   );
