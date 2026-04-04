@@ -5,6 +5,7 @@ import { persist } from "zustand/middleware";
 export interface AuthProfile {
   name: string;
   email?: string | null;
+  pictureUrl?: string | null;
 }
 
 interface AuthState {
@@ -12,6 +13,10 @@ interface AuthState {
   refreshToken: string | null;
   expiresAt: number | null;
   profile: AuthProfile | null;
+  balance: number | null;
+  role: "USER" | "ADMIN" | null;
+  giftAvailable: boolean;
+  nextGiftAt: string | null;
 
   saveAuth: (
     accessToken: string,
@@ -20,6 +25,15 @@ interface AuthState {
     profile?: AuthProfile | null,
   ) => void;
   saveProfile: (profile: AuthProfile | null) => void;
+  saveUserData: (data: {
+    balance: number;
+    role: "USER" | "ADMIN";
+    giftAvailable: boolean;
+    nextGiftAt: string | null;
+    profile?: AuthProfile | null;
+  }) => void;
+  updateBalance: (balance: number) => void;
+  updateGift: (giftAvailable: boolean, nextGiftAt: string | null) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
 }
@@ -31,6 +45,10 @@ export const AuthStore = create<AuthState>()(
       refreshToken: null,
       expiresAt: null,
       profile: null,
+      balance: null,
+      role: null,
+      giftAvailable: false,
+      nextGiftAt: null,
 
       saveAuth: (accessToken, refreshToken, expiresInSeconds, profile) => {
         set({
@@ -43,12 +61,29 @@ export const AuthStore = create<AuthState>()(
 
       saveProfile: (profile) => set({ profile }),
 
+      saveUserData: ({ balance, role, giftAvailable, nextGiftAt, profile }) => {
+        const update: Partial<AuthState> = { balance, role, giftAvailable, nextGiftAt };
+        if (profile !== undefined) {
+          update.profile = profile;
+        }
+        set(update);
+      },
+
+      updateBalance: (balance) => set({ balance }),
+
+      updateGift: (giftAvailable, nextGiftAt) =>
+        set({ giftAvailable, nextGiftAt }),
+
       logout: () =>
         set({
           accessToken: null,
           refreshToken: null,
           expiresAt: null,
           profile: null,
+          balance: null,
+          role: null,
+          giftAvailable: false,
+          nextGiftAt: null,
         }),
 
       isAuthenticated: () => {
@@ -63,6 +98,10 @@ export const AuthStore = create<AuthState>()(
         refreshToken: state.refreshToken,
         expiresAt: state.expiresAt,
         profile: state.profile,
+        balance: state.balance,
+        role: state.role,
+        giftAvailable: state.giftAvailable,
+        nextGiftAt: state.nextGiftAt,
       }),
     },
   ),

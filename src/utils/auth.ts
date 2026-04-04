@@ -1,6 +1,6 @@
 import type { AuthProfile } from "../store/authStore";
 
-const fallbackProfileName = "Desk User";
+const fallbackProfileName = "User";
 
 export function isSessionAuthenticated(
   accessToken: string | null,
