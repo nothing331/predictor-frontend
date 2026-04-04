@@ -8,17 +8,17 @@ export default function SiteFooter() {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   return (
-    <footer className="mt-16 section-divider pt-0">
+    <footer className="mt-10 md:mt-16 section-divider pt-0">
       {/* How to Play - expandable section */}
       <section className="app-panel overflow-hidden">
         <button
           type="button"
-          className="w-full px-5 py-5 md:px-8 md:py-6 flex items-center justify-between gap-4 text-left cursor-pointer bg-transparent border-none"
+          className="w-full px-3.5 py-3.5 md:px-8 md:py-6 flex items-center justify-between gap-3 md:gap-4 text-left cursor-pointer bg-transparent border-none"
           onClick={() => setHowToPlayOpen((o) => !o)}
         >
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-[#16130f]">
-              <span className="material-symbols-outlined text-[1.25rem]">
+          <div className="flex items-center gap-2 md:gap-3">
+            <span className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full bg-primary text-[#16130f]">
+              <span className="material-symbols-outlined text-[1rem] md:text-[1.25rem]">
                 sports_esports
               </span>
             </span>
@@ -35,8 +35,8 @@ export default function SiteFooter() {
         </button>
 
         {howToPlayOpen ? (
-          <div className="px-5 pb-6 md:px-8 md:pb-8">
-            <div className="grid gap-6 md:grid-cols-3">
+          <div className="px-3.5 pb-4 md:px-8 md:pb-8">
+            <div className="grid gap-3 md:gap-6 md:grid-cols-3">
               <HowToPlayStep
                 number="01"
                 icon="account_circle"
@@ -61,8 +61,8 @@ export default function SiteFooter() {
       </section>
 
       {/* Bottom bar */}
-      <div className="mt-6 px-2 pb-8">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+      <div className="mt-4 px-1 pb-6 md:mt-6 md:px-2 md:pb-8">
+        <div className="flex flex-col gap-4 md:gap-6 md:flex-row md:items-start md:justify-between">
           <div className="max-w-lg space-y-3">
             <Link className="brand-mark inline-flex" to="/">
               <span className="brand-sigil">
@@ -423,7 +423,7 @@ function HowToPlayStep({
   description: string;
 }) {
   return (
-    <div className="app-panel-subtle px-5 py-5 space-y-3">
+    <div className="app-panel-subtle px-3.5 py-3.5 md:px-5 md:py-5 space-y-2 md:space-y-3">
       <div className="flex items-center justify-between">
         <span className="type-value-md font-mono font-bold text-primary opacity-30">
           {number}

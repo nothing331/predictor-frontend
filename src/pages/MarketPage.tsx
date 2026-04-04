@@ -190,10 +190,10 @@ export default function MarketPage() {
       <div className="page-content">
         <AppHeader />
 
-        <main className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="min-w-0 space-y-8">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
+        <main className="grid gap-5 md:gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="min-w-0 space-y-5 md:space-y-8">
+            <div className="space-y-3 md:space-y-4">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3">
                 <Link
                   className="eyebrow text-[inherit] no-underline flex items-center gap-1"
                   to="/"
@@ -207,9 +207,9 @@ export default function MarketPage() {
                 </span>
               </div>
 
-              <div className="flex items-start gap-5">
-                <span className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl bg-primary text-[#16130f]">
-                  <span className="material-symbols-outlined text-[2rem]">
+              <div className="flex items-start gap-3 md:gap-5">
+                <span className="flex h-10 w-10 md:h-16 md:w-16 flex-none items-center justify-center rounded-xl md:rounded-2xl bg-primary text-[#16130f]">
+                  <span className="material-symbols-outlined text-[1.25rem] md:text-[2rem]">
                     {marketIcon}
                   </span>
                 </span>
@@ -220,9 +220,9 @@ export default function MarketPage() {
               </div>
             </div>
 
-            <section className="app-panel-subtle overflow-hidden px-5 py-6 md:px-8 md:py-8">
-              <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-                <div className="space-y-3">
+            <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-8 md:py-8">
+              <div className="mb-4 md:mb-6 flex flex-wrap items-start justify-between gap-3 md:gap-4">
+                <div className="space-y-2 md:space-y-3">
                   <p className="eyebrow">Price history</p>
                   <div className="market-history-summary">
                     {market.outcomes.map((outcome) => (
@@ -271,7 +271,7 @@ export default function MarketPage() {
                 </div>
               </div>
 
-              <div className="chart-surface h-80 w-full md:h-[26rem]">
+              <div className="chart-surface h-52 w-full md:h-[26rem]">
                 {isHistoryLoading && !history ? (
                   <ChartHistoryLoading />
                 ) : isHistoryError && !history ? (
@@ -283,12 +283,12 @@ export default function MarketPage() {
                 )}
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-                <span className="muted-copy">
+              <div className="mt-3 md:mt-4 flex flex-wrap items-center justify-between gap-3 md:gap-4">
+                <span className="muted-copy type-body-sm">
                   {formatCompactCurrency(market.totalValue)} volume
                 </span>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {marketHistoryRangeOptions.map((option) => (
                     <button
                       key={option.id}
@@ -308,7 +308,7 @@ export default function MarketPage() {
             </section>
 
             <section className="app-panel-subtle overflow-hidden">
-              <div className="surface-line type-body-sm grid grid-cols-[minmax(0,1fr)_120px] gap-4 px-5 py-4 md:px-8">
+              <div className="surface-line type-body-sm grid grid-cols-[minmax(0,1fr)_80px] md:grid-cols-[minmax(0,1fr)_120px] gap-3 md:gap-4 px-3.5 py-3 md:px-8 md:py-4">
                 <span className="eyebrow">Outcome</span>
                 <span className="eyebrow text-center">Chance</span>
               </div>
@@ -316,11 +316,11 @@ export default function MarketPage() {
               {market.outcomes.map((outcome, index) => (
                 <article
                   key={outcome.outcomeId}
-                  className="surface-line last:border-b-0 grid grid-cols-[minmax(0,1fr)_120px] items-center gap-4 px-5 py-5 md:px-8"
+                  className="surface-line last:border-b-0 grid grid-cols-[minmax(0,1fr)_80px] md:grid-cols-[minmax(0,1fr)_120px] items-center gap-3 md:gap-4 px-3.5 py-3.5 md:px-8 md:py-5"
                 >
-                  <div className="flex min-w-0 items-center gap-4">
+                  <div className="flex min-w-0 items-center gap-3 md:gap-4">
                     <span
-                      className="flex h-11 w-11 flex-none items-center justify-center rounded-full text-[color:var(--text-strong)]"
+                      className="flex h-8 w-8 md:h-11 md:w-11 flex-none items-center justify-center rounded-full text-[color:var(--text-strong)]"
                       style={{
                         background:
                           "color-mix(in srgb, var(--surface-soft) 78%, transparent)",
@@ -351,19 +351,19 @@ export default function MarketPage() {
             </section>
           </section>
 
-          <aside className="2xl:sticky 2xl:top-6 2xl:self-start">
+          <aside className="lg:sticky lg:top-6 lg:self-start">
             <section className="app-panel-subtle overflow-hidden">
-              <div className="px-5 py-6 md:px-6">
-                <div className="mb-5 flex items-start gap-4">
-                  <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-primary text-[#16130f]">
-                    <span className="material-symbols-outlined text-[2rem]">
+              <div className="px-3.5 py-4 md:px-6 md:py-6">
+                <div className="mb-4 md:mb-5 flex items-start gap-3 md:gap-4">
+                  <span className="flex h-10 w-10 md:h-14 md:w-14 flex-none items-center justify-center rounded-xl md:rounded-2xl bg-primary text-[#16130f]">
+                    <span className="material-symbols-outlined text-[1.25rem] md:text-[2rem]">
                       {marketIcon}
                     </span>
                   </span>
 
                   <div>
                     <p className="muted-copy type-body-sm">{market.marketName}</p>
-                    <p className="type-heading-sm mt-2 text-primary">
+                    <p className="type-heading-sm mt-1 md:mt-2 text-primary">
                       {market.status === "OPEN"
                         ? `Buy ${leadOutcome?.label ?? "Outcome"}`
                         : resolvedLabel}
@@ -371,7 +371,7 @@ export default function MarketPage() {
                   </div>
                 </div>
 
-                <div className="mb-5 grid grid-cols-2 gap-3">
+                <div className="mb-4 md:mb-5 grid grid-cols-2 gap-2 md:gap-3">
                   {market.outcomes.slice(0, 2).map((outcome) => (
                     <button
                       key={outcome.outcomeId}
@@ -393,8 +393,8 @@ export default function MarketPage() {
                   ))}
                 </div>
 
-                <label className="mb-5 block">
-                  <span className="eyebrow mb-3 block">Amount</span>
+                <label className="mb-4 md:mb-5 block">
+                  <span className="eyebrow mb-2 md:mb-3 block">Amount</span>
                   <div className="app-panel-subtle field-shell trade-amount-shell">
                     <span className="trade-amount-prefix">{"\u0192"}</span>
                     <input
@@ -410,7 +410,7 @@ export default function MarketPage() {
                   </div>
                 </label>
 
-                <div className="mb-5 flex flex-wrap gap-2">
+                <div className="mb-4 md:mb-5 flex flex-wrap gap-1.5 md:gap-2">
                   {quickAmounts.map((quickAmount) => (
                     <button
                       key={quickAmount.label}
@@ -476,7 +476,7 @@ export default function MarketPage() {
                 )}
 
                 {isAuthenticated && position && position.tradeCount > 0 ? (
-                  <div className="mt-6 space-y-4">
+                  <div className="mt-4 md:mt-6 space-y-3 md:space-y-4">
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-primary text-[1.25rem]">trending_up</span>
                       <p className="type-heading-sm uppercase">Your Position</p>
@@ -550,10 +550,10 @@ export default function MarketPage() {
         </main>
 
         {market.description ? (
-          <section className="section-divider mt-10 pt-8">
-            <div className="app-panel-subtle px-5 py-6 md:px-8 md:py-8">
-              <p className="eyebrow mb-3">About this market</p>
-              <h2 className="section-title mb-5">Resolution rules</h2>
+          <section className="section-divider mt-6 pt-5 md:mt-10 md:pt-8">
+            <div className="app-panel-subtle px-3.5 py-4 md:px-8 md:py-8">
+              <p className="eyebrow mb-2 md:mb-3">About this market</p>
+              <h2 className="section-title mb-3 md:mb-5">Resolution rules</h2>
 
               <p className="max-w-4xl leading-relaxed text-[color:var(--text-muted)]">
                 {market.description}
@@ -574,13 +574,13 @@ function MarketPageSkeleton() {
       <div className="page-content">
         <AppHeader />
 
-        <main className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="space-y-8">
-            <div className="app-panel-subtle h-40 animate-pulse" />
-            <div className="app-panel-subtle h-[34rem] animate-pulse" />
-            <div className="app-panel-subtle h-[24rem] animate-pulse" />
+        <main className="grid gap-5 md:gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="space-y-5 md:space-y-8">
+            <div className="app-panel-subtle h-28 md:h-40 animate-pulse" />
+            <div className="app-panel-subtle h-64 md:h-[34rem] animate-pulse" />
+            <div className="app-panel-subtle h-40 md:h-[24rem] animate-pulse" />
           </section>
-          <aside className="app-panel-subtle h-[32rem] animate-pulse" />
+          <aside className="app-panel-subtle h-72 md:h-[32rem] animate-pulse" />
         </main>
       </div>
     </div>

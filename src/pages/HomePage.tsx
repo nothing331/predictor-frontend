@@ -90,12 +90,12 @@ export default function HomePage() {
 
         <HowToPlayBanner />
 
-        <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <main className="min-w-0 space-y-12">
+        <div className="grid gap-6 md:gap-10 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_320px]">
+          <main className="min-w-0 space-y-8 md:space-y-12">
             {/* Live Markets */}
             <section>
-              <div className="flex items-center gap-3 mb-6">
-                <span className="flex h-3 w-3 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
+              <div className="flex items-center gap-2 mb-4 md:gap-3 md:mb-6">
+                <span className="flex h-2.5 w-2.5 md:h-3 md:w-3 rounded-full bg-[var(--color-accent-green)] animate-pulse" />
                 <h2 className="section-title">Live Markets</h2>
               </div>
 
@@ -107,7 +107,7 @@ export default function HomePage() {
                 />
               ) : null}
               {!isLoading && !isError && filteredOpenCards.length > 0 ? (
-                <div className="grid gap-6 lg:grid-cols-2">
+                <div className="grid gap-4 md:gap-6 md:grid-cols-2">
                   {filteredOpenCards.map((market) => (
                     <MarketCard key={market.id} market={market} />
                   ))}
@@ -118,9 +118,9 @@ export default function HomePage() {
             {/* Resolved Markets */}
             {!isResolvedLoading && resolvedCards.length > 0 ? (
               <section>
-                <div className="section-divider pt-8">
-                  <div className="flex items-center justify-between gap-4 mb-6">
-                    <div className="flex items-center gap-3">
+                <div className="section-divider pt-6 md:pt-8">
+                  <div className="flex items-center justify-between gap-4 mb-4 md:mb-6">
+                    <div className="flex items-center gap-2 md:gap-3">
                       <span className="material-symbols-outlined text-[1.25rem] text-[color:var(--text-muted)]">
                         check_circle
                       </span>
@@ -128,7 +128,7 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="grid gap-6 lg:grid-cols-2">
+                  <div className="grid gap-4 md:gap-6 md:grid-cols-2">
                     {resolvedCards.map((market) => (
                       <MarketCard key={market.id} market={market} />
                     ))}
@@ -138,7 +138,7 @@ export default function HomePage() {
             ) : null}
           </main>
 
-          <aside className="xl:sticky xl:top-6 xl:self-start">
+          <aside className="lg:sticky lg:top-6 lg:self-start">
             {isAuthenticated ? (
               <HomeSidebar />
             ) : (
@@ -161,43 +161,41 @@ function MarketCard({ market }: { market: HomeMarketCard }) {
   return (
     <Link
       aria-label={`Open market ${market.title}`}
-      className="app-panel-subtle flex h-full flex-col justify-between px-5 py-6 text-[inherit] no-underline transition-transform duration-200 hover:-translate-y-1 md:px-7 md:py-7"
+      className="app-panel-subtle flex h-full flex-col justify-between px-3.5 py-4 text-[inherit] no-underline transition-transform duration-200 hover:-translate-y-1 md:px-5 md:py-6"
       to={getMarketPath(market.id)}
     >
       <div className="min-w-0">
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-4">
-            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-primary text-[#16130f]">
-              <span className="material-symbols-outlined text-[1.5rem]">
-                {market.icon}
-              </span>
+        <div className="mb-3 flex items-start gap-3 md:mb-6 md:gap-4">
+          <span className="flex h-9 w-9 md:h-12 md:w-12 flex-none items-center justify-center rounded-full bg-primary text-[#16130f]">
+            <span className="material-symbols-outlined text-[1.1rem] md:text-[1.5rem]">
+              {market.icon}
             </span>
-            <div className="min-w-0">
-              <p className="eyebrow mb-2">{market.category}</p>
-              <h2 className="type-heading-md">{market.title}</h2>
-            </div>
+          </span>
+          <div className="min-w-0">
+            <p className="eyebrow mb-1 md:mb-2">{market.category}</p>
+            <h2 className="type-heading-md">{market.title}</h2>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-2.5 md:space-y-4">
           {market.outcomes.map((outcome) => (
             <div
               key={`${market.id}-${outcome.id}`}
-              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4"
+              className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 md:gap-4"
             >
               <span
-                className="flex h-10 w-10 items-center justify-center rounded-full text-[color:var(--text-muted)]"
+                className="flex h-8 w-8 md:h-10 md:w-10 items-center justify-center rounded-full text-[color:var(--text-muted)]"
                 style={{
                   background:
                     "color-mix(in srgb, var(--surface-soft) 78%, transparent)",
                 }}
               >
-                <span className="material-symbols-outlined text-[1.25rem]">
+                <span className="material-symbols-outlined text-[1rem] md:text-[1.25rem]">
                   {outcome.icon}
                 </span>
               </span>
               <div className="min-w-0">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center justify-between gap-2 md:gap-3">
                   <span className="type-body-lg truncate font-medium">
                     {outcome.label}
                   </span>
@@ -206,11 +204,11 @@ function MarketCard({ market }: { market: HomeMarketCard }) {
                   </span>
                 </div>
                 <div
-                  className={`mt-2 h-[2px] w-14 rounded-full ${outcome.accent}`}
+                  className={`mt-1.5 h-[2px] w-10 md:w-14 rounded-full ${outcome.accent}`}
                 />
               </div>
               <span
-                className={`chip !px-3 ${
+                className={`chip !px-2 md:!px-3 ${
                   outcome.id === "YES" ? "chip-primary" : "chip-secondary"
                 }`}
               >
@@ -221,7 +219,7 @@ function MarketCard({ market }: { market: HomeMarketCard }) {
         </div>
       </div>
 
-      <div className="section-divider type-body-sm mt-8 flex items-center justify-between gap-4 pt-4">
+      <div className="section-divider type-body-sm mt-5 flex items-center justify-between gap-3 pt-3 md:mt-8 md:gap-4 md:pt-4">
         <span className="muted-copy">{market.volume}</span>
         <span className="muted-copy">{market.statusLabel}</span>
       </div>
@@ -411,15 +409,15 @@ function HowToPlayBanner() {
   if (!open) return null;
 
   return (
-    <section className="mb-8 app-panel-subtle overflow-hidden">
-      <div className="px-5 py-4 md:px-7 md:py-5 flex items-center justify-between gap-4">
+    <section className="mb-5 md:mb-8 app-panel-subtle overflow-hidden">
+      <div className="px-3.5 py-3 md:px-7 md:py-5 flex items-center justify-between gap-3 md:gap-4">
         <div className="flex items-center gap-4 min-w-0">
-          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-primary text-[#16130f]">
-            <span className="material-symbols-outlined text-[1.1rem]">sports_esports</span>
+          <span className="flex h-7 w-7 md:h-9 md:w-9 flex-none items-center justify-center rounded-full bg-primary text-[#16130f]">
+            <span className="material-symbols-outlined text-[0.9rem] md:text-[1.1rem]">sports_esports</span>
           </span>
           <div className="min-w-0">
-            <p className="type-body-md font-semibold">New here? Here's how it works</p>
-            <p className="type-body-sm text-[color:var(--text-muted)] mt-1">
+            <p className="type-body-sm md:type-body-md font-semibold">New here? Here's how it works</p>
+            <p className="type-body-sm text-[color:var(--text-muted)] mt-0.5 md:mt-1 hidden md:block">
               Sign in &rarr; Pick a market &rarr; Buy shares in the outcome you believe &rarr; Earn when you're right. Claim free {"\u0192"}500 every 12 hours.
             </p>
           </div>
@@ -449,7 +447,7 @@ function HomeSidebar() {
 
   return (
     <section className="app-panel-subtle overflow-hidden">
-      <div className="px-5 py-6 md:px-6 space-y-5">
+      <div className="px-3.5 py-4 md:px-6 md:py-6 space-y-4 md:space-y-5">
         <div>
           <p className="eyebrow mb-2">Your balance</p>
           <p className="type-value-md font-mono font-bold text-primary">
@@ -522,11 +520,11 @@ function HomeSidebar() {
 
 function MarketBoardSkeleton() {
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-4 md:gap-6 md:grid-cols-2">
       {Array.from({ length: 4 }, (_, index) => (
         <article
           key={index}
-          className="market-state-card app-panel-subtle animate-pulse px-5 py-6 md:px-7 md:py-7"
+          className="market-state-card app-panel-subtle animate-pulse px-3.5 py-4 md:px-5 md:py-6"
         >
           <div className="market-state-block h-4 w-24" />
           <div className="market-state-block mt-5 h-16 w-full" />

@@ -53,12 +53,12 @@ export default function AdminPage() {
       <div className="page-content">
         <AppHeader />
 
-        <div className="mb-6">
-          <p className="eyebrow mb-2">Admin controls</p>
+        <div className="mb-4 md:mb-6">
+          <p className="eyebrow mb-1 md:mb-2">Admin controls</p>
           <h1 className="display-title">Manage Markets</h1>
         </div>
 
-        <div className="grid gap-8 xl:grid-cols-2">
+        <div className="grid gap-5 md:gap-8 lg:grid-cols-2">
           <CreateMarketSection />
           <ResolveMarketSection />
         </div>
@@ -112,7 +112,7 @@ function CreateMarketSection() {
 
   return (
     <section className="app-panel overflow-hidden">
-      <div className="px-5 py-6 md:px-7 md:py-7">
+      <div className="px-3.5 py-4 md:px-7 md:py-7">
         <div className="mb-6 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-[#16130f]">
             <span className="material-symbols-outlined text-[1.25rem]">
@@ -176,7 +176,7 @@ function CreateMarketSection() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
             <label className="block">
               <span className="eyebrow mb-3 block">Liquidity</span>
               <div className="app-panel-subtle field-shell">
@@ -264,7 +264,7 @@ function ResolveMarketSection() {
 
   return (
     <section className="app-panel overflow-hidden">
-      <div className="px-5 py-6 md:px-7 md:py-7">
+      <div className="px-3.5 py-4 md:px-7 md:py-7">
         <div className="mb-6 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-white">
             <span className="material-symbols-outlined text-[1.25rem]">
