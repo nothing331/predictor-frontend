@@ -2,10 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createTrade,
   createMarket,
+  resolveMarket,
   getMarketById,
   getMarkets,
   type CreateTradeRequest,
   type CreateMarketRequest,
+  type ResolveMarketRequest,
 } from "@/api/market";
 import { ErrorStore } from "@/store/errorStore";
 
@@ -49,6 +51,8 @@ export function useCreateTrade(marketId: string) {
       queryClient.invalidateQueries({ queryKey: ["market-history", marketId] });
       queryClient.invalidateQueries({ queryKey: ["markets"] });
       queryClient.invalidateQueries({ queryKey: ["market", marketId] });
+      queryClient.invalidateQueries({ queryKey: ["market-position", marketId] });
+      queryClient.invalidateQueries({ queryKey: ["auth-me"] });
       ErrorStore.getState().pushToast({
         title: "Trade executed",
         message: `Bought ${trade.sharesBought.toFixed(3)} shares of ${trade.outcome} for ${formatCurrency(trade.cost)}.`,
@@ -58,10 +62,33 @@ export function useCreateTrade(marketId: string) {
   });
 }
 
+export function useResolveMarket() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      marketId,
+      payload,
+    }: {
+      marketId: string;
+      payload: ResolveMarketRequest;
+    }) => resolveMarket(marketId, payload),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["markets"] });
+      queryClient.invalidateQueries({ queryKey: ["market", result.marketId] });
+      ErrorStore.getState().pushToast({
+        title: "Market resolved",
+        message: `Resolved to ${result.resolvedOutcome}.`,
+        tone: "info",
+      });
+    },
+  });
+}
+
 function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    currency: "USD",
+  const formatted = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
-    style: "currency",
+    minimumFractionDigits: 2,
   }).format(value);
+  return `\u0192${formatted}`;
 }

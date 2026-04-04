@@ -55,12 +55,11 @@ export function formatPrice(probability: number) {
 }
 
 export function formatCompactCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    currency: "USD",
+  const formatted = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: value >= 1000 ? 1 : 2,
     notation: value >= 1000 ? "compact" : "standard",
-    style: "currency",
   }).format(value);
+  return `\u0192${formatted}`;
 }
 
 function clampProbability(probability: number) {

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import { AuthStore } from "@/store/authStore";
 import { isSessionAuthenticated } from "@/utils/auth";
 import { useCreateMarket } from "@/hooks/useMarkets";
@@ -32,7 +31,13 @@ export default function CreateMarketDock({
 }: CreateMarketDockProps) {
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const role = AuthStore((state) => state.role);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+
+  // Only ADMIN users can create markets
+  if (!isAuthenticated || role !== "ADMIN") {
+    return null;
+  }
   const createMarket = useCreateMarket();
   const [form, setForm] = useState<FormState>(initialFormState);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -86,73 +91,22 @@ export default function CreateMarketDock({
             return;
           }
 
-          setErrorMessage("We could not launch this market. Please try again.");
+          setErrorMessage("Could not create market. Please try again.");
         },
       },
     );
   };
 
   return (
-    <section className="launchpad-panel app-panel mt-12 overflow-hidden">
-      <div className="launchpad-grid">
-        <div className="launchpad-hero">
-          <p className="eyebrow">Market launchpad</p>
-          <h2 className="display-title launchpad-title">
-            Write the next
-            <br />
-            live question
-          </h2>
-          <p className="launchpad-copy">
-            Turn a sharp prediction into a tradable board. Set the framing,
-            seed the opening liquidity, and publish it directly into the live
-            desk below.
-          </p>
-
-          <div className="launchpad-stats">
-            <div className="launchpad-stat">
-              <span className="eyebrow">Format</span>
-              <strong>Binary markets</strong>
-            </div>
-            <div className="launchpad-stat">
-              <span className="eyebrow">Velocity</span>
-              <strong>Home board publish</strong>
-            </div>
-            <div className="launchpad-stat">
-              <span className="eyebrow">Default flow</span>
-              <strong>Yes / No pricing</strong>
-            </div>
-          </div>
-        </div>
-
-        <div className="launchpad-form-shell">
-          {!isAuthenticated ? (
-            <div className="launchpad-guest app-panel-subtle">
-              <p className="eyebrow">Members only</p>
-              <h3 className="type-heading-sm mt-3 uppercase">
-                Sign in to launch a market
-              </h3>
-              <p className="mt-4 max-w-xl text-[color:var(--text-muted)]">
-                You can explore the board as a guest, but creating markets
-                requires an active signed-in desk session.
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link className="action-primary" to="/login">
-                  Sign in
-                </Link>
-                <Link className="action-ghost" to="/create-account">
-                  Join the desk
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <form className="launchpad-form app-panel-subtle" onSubmit={onSubmit}>
-              <div className="launchpad-form-header">
+    <section className="app-panel mt-12 overflow-hidden">
+        <div className="px-5 py-6 md:px-8">
+            <form className="space-y-5" onSubmit={onSubmit}>
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="eyebrow">Create market</p>
-                  <h3 className="type-heading-sm mt-3 uppercase">
-                    Publish from home
-                  </h3>
+                  <h3 className="section-title">Create a Market</h3>
+                  <p className="mt-2 text-[color:var(--text-muted)] type-body-sm">
+                    Ask a yes-or-no question for others to predict.
+                  </p>
                 </div>
                 <span className="chip chip-primary">Live draft</span>
               </div>
@@ -266,23 +220,13 @@ export default function CreateMarketDock({
                 </label>
               </div>
 
-              <div className="launchpad-submit-row">
-                <div className="min-w-0">
-                  <p className="eyebrow">Submit behavior</p>
-                  <p className="type-body-sm mt-2 text-[color:var(--text-muted)]">
-                    Creation publishes directly to the home board and refreshes
-                    the open markets feed.
-                  </p>
-                </div>
-
-                <button
-                  className="action-secondary"
-                  disabled={createMarket.isPending}
-                  type="submit"
-                >
-                  {createMarket.isPending ? "Publishing..." : "Launch market"}
-                </button>
-              </div>
+              <button
+                className="action-secondary w-full justify-center"
+                disabled={createMarket.isPending}
+                type="submit"
+              >
+                {createMarket.isPending ? "Creating..." : "Create market"}
+              </button>
 
               {errorMessage ? (
                 <p className="launchpad-feedback launchpad-feedback-error">
@@ -290,9 +234,7 @@ export default function CreateMarketDock({
                 </p>
               ) : null}
             </form>
-          )}
         </div>
-      </div>
     </section>
   );
 }

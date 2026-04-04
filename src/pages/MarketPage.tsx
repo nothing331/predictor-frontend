@@ -25,18 +25,18 @@ import {
 } from "@/features/markets/marketRoutes";
 import { useMarketEventStream } from "@/hooks/useMarketEventStream";
 import { useMarketHistory } from "@/hooks/useMarketHistory";
+import { useMarketPosition } from "@/hooks/useMarketPosition";
 import { useCreateTrade, useMarket } from "@/hooks/useMarkets";
 import { AuthStore } from "@/store/authStore";
 import { isSessionAuthenticated } from "@/utils/auth";
-import BrandMark from "../components/BrandMark";
-import HeaderAccountActions from "../components/HeaderAccountActions";
+import AppHeader from "../components/AppHeader";
+import SiteFooter from "../components/SiteFooter";
 
-const categories = ["All", "Politics", "Tech", "Sports", "Crypto"];
 const quickAmounts = [
-  { amount: 1, label: "+$1" },
-  { amount: 5, label: "+$5" },
-  { amount: 10, label: "+$10" },
-  { amount: 100, label: "+$100" },
+  { amount: 1, label: "+\u01921" },
+  { amount: 5, label: "+\u01925" },
+  { amount: 10, label: "+\u019210" },
+  { amount: 100, label: "+\u0192100" },
 ];
 
 export default function MarketPage() {
@@ -60,6 +60,7 @@ export default function MarketPage() {
     refetch: refetchHistory,
   } = useMarketHistory(marketId, activeRange);
   const tradeMutation = useCreateTrade(marketId);
+  const { data: position } = useMarketPosition(marketId);
   const [selectedOutcome, setSelectedOutcome] =
     useState<MarketOutcomeDto["outcomeId"] | null>(null);
   const [amountInput, setAmountInput] = useState("");
@@ -158,7 +159,6 @@ export default function MarketPage() {
 
   const category = getMarketCategory(market.category);
   const marketIcon = getCategoryIcon(category);
-  const descriptionBlocks = buildDescriptionBlocks(market);
   const leadOutcome = getLeadOutcome(market.outcomes);
   const resolvedLabel = getResolvedLabel(market);
   const tradeDestination = `/login?redirectTo=${encodeURIComponent(
@@ -188,54 +188,23 @@ export default function MarketPage() {
   return (
     <div className="page-shell">
       <div className="page-content">
-        <header className="surface-line mb-8 pb-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <BrandMark caption="Live market detail" />
-
-            <div className="flex flex-1 flex-col gap-5 xl:max-w-5xl xl:flex-row xl:items-center xl:justify-end">
-              <label className="app-panel-subtle field-shell search-shell flex-1">
-                <span className="material-symbols-outlined">search</span>
-                <input
-                  className="app-input search-input uppercase"
-                  placeholder="Search markets, creators, or topics"
-                  type="text"
-                />
-              </label>
-
-              <div className="flex flex-wrap gap-2">
-                {categories.map((entry) => (
-                  <button
-                    key={entry}
-                    className={`chip ${
-                      entry === category ? "chip-primary" : "chip-soft"
-                    } ${entry === category ? "" : "!border-transparent !bg-transparent"}`}
-                    type="button"
-                  >
-                    {entry}
-                  </button>
-                ))}
-              </div>
-
-              <HeaderAccountActions />
-            </div>
-          </div>
-        </header>
+        <AppHeader />
 
         <main className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
           <section className="min-w-0 space-y-8">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
                 <Link
-                  className="eyebrow text-[inherit] no-underline"
+                  className="eyebrow text-[inherit] no-underline flex items-center gap-1"
                   to="/"
                 >
-                  Back to board
+                  <span className="material-symbols-outlined text-[1rem]">arrow_back</span>
+                  All markets
                 </Link>
                 <span className="eyebrow">{category}</span>
                 <span className="eyebrow">
-                  {market.status === "OPEN" ? "Open market" : "Resolved market"}
+                  {market.status === "OPEN" ? "Open" : "Resolved"}
                 </span>
-                <span className="eyebrow">ID {shortenMarketId(market.marketId)}</span>
               </div>
 
               <div className="flex items-start gap-5">
@@ -247,9 +216,6 @@ export default function MarketPage() {
 
                 <div className="min-w-0">
                   <h1 className="display-title">{market.marketName}</h1>
-                  <p className="muted-copy mt-4 max-w-3xl type-body-md">
-                    Market ID: {market.marketId}
-                  </p>
                 </div>
               </div>
             </div>
@@ -319,8 +285,7 @@ export default function MarketPage() {
 
               <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                 <span className="muted-copy">
-                  {formatCompactCurrency(market.totalValue)} vol ·{" "}
-                  {combinedHistoryPoints.length} plotted points
+                  {formatCompactCurrency(market.totalValue)} volume
                 </span>
 
                 <div className="flex flex-wrap gap-2">
@@ -343,17 +308,15 @@ export default function MarketPage() {
             </section>
 
             <section className="app-panel-subtle overflow-hidden">
-              <div className="surface-line type-body-sm grid grid-cols-[minmax(0,1fr)_120px_150px_150px] gap-4 px-5 py-4 md:px-8">
+              <div className="surface-line type-body-sm grid grid-cols-[minmax(0,1fr)_120px] gap-4 px-5 py-4 md:px-8">
                 <span className="eyebrow">Outcome</span>
                 <span className="eyebrow text-center">Chance</span>
-                <span className="eyebrow text-center">Buy yes</span>
-                <span className="eyebrow text-center">Buy no</span>
               </div>
 
               {market.outcomes.map((outcome, index) => (
                 <article
                   key={outcome.outcomeId}
-                  className="surface-line last:border-b-0 grid grid-cols-[minmax(0,1fr)_120px_150px_150px] items-center gap-4 px-5 py-5 md:px-8"
+                  className="surface-line last:border-b-0 grid grid-cols-[minmax(0,1fr)_120px] items-center gap-4 px-5 py-5 md:px-8"
                 >
                   <div className="flex min-w-0 items-center gap-4">
                     <span
@@ -383,17 +346,6 @@ export default function MarketPage() {
                   <span className="type-heading-sm text-center font-mono font-semibold">
                     {formatProbability(outcome.probability)}
                   </span>
-
-                  <button className="chip chip-primary justify-center !py-3" type="button">
-                    Yes {formatPrice(outcome.probability)}
-                  </button>
-
-                  <button
-                    className="chip chip-secondary justify-center !py-3"
-                    type="button"
-                  >
-                    No {formatPrice(1 - outcome.probability)}
-                  </button>
                 </article>
               ))}
             </section>
@@ -417,20 +369,6 @@ export default function MarketPage() {
                         : resolvedLabel}
                     </p>
                   </div>
-                </div>
-
-                <div className="mb-5 flex items-center justify-between gap-4">
-                  <div className="flex gap-2">
-                    <button className="chip chip-primary" type="button">
-                      {market.status === "OPEN" ? "Buy" : "Resolved"}
-                    </button>
-                    <span className="chip chip-soft !border-transparent !bg-transparent">
-                      Budget order
-                    </span>
-                  </div>
-                  <span className="eyebrow">
-                    {market.status === "OPEN" ? "Dollars" : resolvedLabel}
-                  </span>
                 </div>
 
                 <div className="mb-5 grid grid-cols-2 gap-3">
@@ -458,7 +396,7 @@ export default function MarketPage() {
                 <label className="mb-5 block">
                   <span className="eyebrow mb-3 block">Amount</span>
                   <div className="app-panel-subtle field-shell trade-amount-shell">
-                    <span className="trade-amount-prefix">$</span>
+                    <span className="trade-amount-prefix">{"\u0192"}</span>
                     <input
                       className="app-input type-value-lg font-mono font-semibold"
                       inputMode="decimal"
@@ -488,11 +426,6 @@ export default function MarketPage() {
                     </button>
                   ))}
                 </div>
-
-                <p className="muted-copy mb-5 type-body-sm">
-                  The backend prices this as a budget order. Enter dollars, pick
-                  an outcome, and the server computes shares for you.
-                </p>
 
                 {market.status !== "OPEN" ? (
                   <button
@@ -541,28 +474,95 @@ export default function MarketPage() {
                     Sign in to trade
                   </Link>
                 )}
+
+                {isAuthenticated && position && position.tradeCount > 0 ? (
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">trending_up</span>
+                      <p className="type-heading-sm uppercase">Your Position</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="app-panel-subtle px-4 py-3"
+                        style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent)" }}
+                      >
+                        <p className="eyebrow mb-1">Invested</p>
+                        <p className="type-heading-md font-mono font-bold">
+                          {"\u0192"}{position.totalInvested.toFixed(2)}
+                        </p>
+                      </div>
+
+                      <div className="app-panel-subtle px-4 py-3"
+                        style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-secondary) 12%, transparent), transparent)" }}
+                      >
+                        <p className="eyebrow mb-1">Trades</p>
+                        <p className="type-heading-md font-mono font-bold">
+                          {position.tradeCount}
+                        </p>
+                      </div>
+                    </div>
+
+                    {position.yesSharesHeld > 0 ? (
+                      <div className="app-panel-subtle px-4 py-3 flex items-center justify-between"
+                        style={{ borderLeft: "4px solid var(--color-primary)" }}
+                      >
+                        <div>
+                          <p className="eyebrow mb-1">Yes shares</p>
+                          <p className="type-body-lg font-mono font-bold">{position.yesSharesHeld.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="eyebrow mb-1">Payout</p>
+                          <p className="type-body-lg font-mono font-bold text-primary">{"\u0192"}{position.projectedPayoutIfYes.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {position.noSharesHeld > 0 ? (
+                      <div className="app-panel-subtle px-4 py-3 flex items-center justify-between"
+                        style={{ borderLeft: "4px solid var(--color-secondary)" }}
+                      >
+                        <div>
+                          <p className="eyebrow mb-1">No shares</p>
+                          <p className="type-body-lg font-mono font-bold">{position.noSharesHeld.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="eyebrow mb-1">Payout</p>
+                          <p className="type-body-lg font-mono font-bold text-secondary">{"\u0192"}{position.projectedPayoutIfNo.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {position.realizedNetPnl !== null ? (
+                      <div className={`app-panel-subtle px-4 py-3 text-center ${position.realizedNetPnl >= 0 ? "status-positive" : "status-negative"}`}
+                        style={{ borderLeft: `4px solid ${position.realizedNetPnl >= 0 ? "var(--color-accent-green)" : "var(--color-accent-red)"}` }}
+                      >
+                        <p className="eyebrow mb-1">Realized P&L</p>
+                        <p className="type-heading-md font-mono font-bold">
+                          {position.realizedNetPnl >= 0 ? "+" : ""}{"\u0192"}{position.realizedNetPnl.toFixed(2)}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             </section>
           </aside>
         </main>
 
-        <section className="section-divider mt-10 pt-8">
-          <div className="app-panel-subtle px-5 py-6 md:px-8 md:py-8">
-            <p className="eyebrow mb-3">Market description</p>
-            <h2 className="section-title mb-5">Resolution rules</h2>
+        {market.description ? (
+          <section className="section-divider mt-10 pt-8">
+            <div className="app-panel-subtle px-5 py-6 md:px-8 md:py-8">
+              <p className="eyebrow mb-3">About this market</p>
+              <h2 className="section-title mb-5">Resolution rules</h2>
 
-            <div className="space-y-4">
-              {descriptionBlocks.map((block) => (
-                <p
-                  key={block}
-                  className="max-w-4xl leading-relaxed text-[color:var(--text-muted)]"
-                >
-                  {block}
-                </p>
-              ))}
+              <p className="max-w-4xl leading-relaxed text-[color:var(--text-muted)]">
+                {market.description}
+              </p>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
+
+        <SiteFooter />
       </div>
     </div>
   );
@@ -572,12 +572,7 @@ function MarketPageSkeleton() {
   return (
     <div className="page-shell">
       <div className="page-content">
-        <header className="surface-line mb-8 pb-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <BrandMark caption="Live market detail" />
-            <div className="app-panel-subtle h-14 w-full max-w-4xl animate-pulse" />
-          </div>
-        </header>
+        <AppHeader />
 
         <main className="grid gap-8 2xl:grid-cols-[minmax(0,1fr)_360px]">
           <section className="space-y-8">
@@ -597,20 +592,19 @@ function MarketPageError({ onRetry }: { onRetry: () => void }) {
     <div className="page-shell">
       <div className="page-content">
         <section className="market-state-card app-panel-subtle px-6 py-7 md:px-8 md:py-8">
-          <p className="eyebrow">Market unavailable</p>
+          <p className="eyebrow">Error</p>
           <h1 className="type-heading-sm mt-3 uppercase">
-            We could not load this market
+            Could not load this market
           </h1>
           <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
-            The detail endpoint did not return a usable response. Retry the
-            market fetch or go back to the home board.
+            Something went wrong. Please try again or go back.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <button className="action-secondary" type="button" onClick={onRetry}>
               Retry detail
             </button>
             <Link className="chip chip-soft text-[inherit] no-underline" to="/">
-              Back to board
+              All markets
             </Link>
           </div>
         </section>
@@ -624,17 +618,17 @@ function MarketNotFound({ marketId }: { marketId?: string }) {
     <div className="page-shell">
       <div className="page-content">
         <section className="market-state-card app-panel-subtle px-6 py-7 md:px-8 md:py-8">
-          <p className="eyebrow">Market missing</p>
+          <p className="eyebrow">Not found</p>
           <h1 className="type-heading-sm mt-3 uppercase">
-            We could not find that market
+            Market not found
           </h1>
           <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
             {marketId
-              ? `No market detail was returned for ${marketId}.`
-              : "The requested market id is missing from the URL."}
+              ? "This market doesn't exist or may have been removed."
+              : "No market was specified in the URL."}
           </p>
           <Link className="action-secondary mt-6 inline-flex no-underline" to="/">
-            Back to board
+            All markets
           </Link>
         </section>
       </div>
@@ -642,23 +636,6 @@ function MarketNotFound({ marketId }: { marketId?: string }) {
   );
 }
 
-function buildDescriptionBlocks(market: MarketDto) {
-  const category = getMarketCategory(market.category);
-  const liveOutcomeSummary = market.outcomes
-    .map(
-      (outcome) =>
-        `${outcome.label} at ${formatProbability(outcome.probability)}`,
-    )
-    .join(", ");
-
-  return [
-    `${market.marketName} is loaded from the live market detail endpoint with category ${category}, status ${market.status}, and reported volume ${formatCompactCurrency(market.totalValue)}.`,
-    market.resolvedOutcome
-      ? `The current payload marks this market as resolved to ${market.resolvedOutcome}. The outcome snapshot right now is ${liveOutcomeSummary}.`
-      : `The current payload marks this market as open. The live outcome snapshot right now is ${liveOutcomeSummary}.`,
-    "Resolution notes, supporting links, and historical commentary are still placeholder content on this screen until the backend exposes richer market-detail fields.",
-  ];
-}
 
 function getLeadOutcome(outcomes: MarketOutcomeDto[]) {
   return outcomes.reduce<MarketOutcomeDto | undefined>((top, outcome) => {
@@ -716,13 +693,6 @@ function formatAmountInput(value: number) {
   return value.toFixed(2).replace(/\.?0+$/, "");
 }
 
-function shortenMarketId(marketId: string) {
-  if (marketId.length <= 16) {
-    return marketId;
-  }
-
-  return `${marketId.slice(0, 8)}...${marketId.slice(-4)}`;
-}
 
 function ChartHistoryLoading() {
   return (
@@ -744,13 +714,12 @@ function ChartHistoryLoading() {
 function ChartHistoryError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="market-chart-state">
-      <p className="eyebrow">History unavailable</p>
+      <p className="eyebrow">Error</p>
       <h2 className="type-heading-sm mt-3 uppercase">
-        We could not load this chart
+        Could not load price history
       </h2>
       <p className="mt-4 max-w-xl text-[color:var(--text-muted)]">
-        The history endpoint did not return a usable graph snapshot yet. Retry
-        the chart request while keeping the rest of the market page visible.
+        Please try again.
       </p>
       <button className="action-secondary mt-6" onClick={onRetry} type="button">
         Retry chart
@@ -764,11 +733,10 @@ function ChartHistoryEmpty() {
     <div className="market-chart-state">
       <p className="eyebrow">No history yet</p>
       <h2 className="type-heading-sm mt-3 uppercase">
-        The chart is waiting for its first point
+        No price history available
       </h2>
       <p className="mt-4 max-w-xl text-[color:var(--text-muted)]">
-        This market detail loaded, but the backend has not returned any history
-        points for the selected range yet.
+        Price history will appear here after the first trade.
       </p>
     </div>
   );
