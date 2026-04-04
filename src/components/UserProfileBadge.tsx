@@ -22,7 +22,6 @@ export default function UserProfileBadge({
       {!compact ? (
         <span className="profile-meta">
           <strong>{name}</strong>
-          <span>Trading desk live</span>
         </span>
       ) : null}
     </div>
