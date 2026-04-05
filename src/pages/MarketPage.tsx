@@ -30,7 +30,6 @@ import {
 import { useMarketPosition } from "@/hooks/useAccount";
 import { useMarketEventStream } from "@/hooks/useMarketEventStream";
 import { useMarketHistory } from "@/hooks/useMarketHistory";
-import { useMarketPosition } from "@/hooks/useMarketPosition";
 import { useCreateTrade, useMarket } from "@/hooks/useMarkets";
 import { AuthStore } from "@/store/authStore";
 import { isSessionAuthenticated } from "@/utils/auth";
@@ -656,6 +655,94 @@ function MarketNotFound({ marketId }: { marketId?: string }) {
 }
 
 
+function getOutcomeIcon(outcomeId: string, index: number) {
+  if (outcomeId === "YES") return "trending_up";
+  if (outcomeId === "NO") return "trending_down";
+  return index === 0 ? "trending_up" : "trending_down";
+}
+
+function MarketPositionPanel({
+  isAuthenticated,
+  onRetry,
+  position,
+  tradeDestination,
+  isError,
+  isLoading,
+}: {
+  isAuthenticated: boolean;
+  market?: MarketDto;
+  onRetry: () => void;
+  position?: MarketUserPositionDto;
+  tradeDestination: string;
+  isError: boolean;
+  isLoading: boolean;
+}) {
+  if (!isAuthenticated) {
+    return (
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
+        <p className="eyebrow mb-2">Your position</p>
+        <p className="type-body-sm text-[color:var(--text-muted)] mb-4">
+          Sign in to see your position in this market.
+        </p>
+        <Link className="action-secondary w-full justify-center no-underline" to={tradeDestination}>
+          Sign in
+        </Link>
+      </section>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5 animate-pulse">
+        <div className="h-4 w-24 bg-[var(--surface-soft)] rounded mb-4" />
+        <div className="h-16 w-full bg-[var(--surface-soft)] rounded" />
+      </section>
+    );
+  }
+
+  if (isError) {
+    return (
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
+        <p className="eyebrow mb-2">Position error</p>
+        <p className="type-body-sm text-[color:var(--text-muted)] mb-4">
+          Could not load your position.
+        </p>
+        <button className="action-secondary" type="button" onClick={onRetry}>
+          Retry
+        </button>
+      </section>
+    );
+  }
+
+  if (!position || position.tradeCount === 0) {
+    return null;
+  }
+
+  return (
+    <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
+      <p className="eyebrow mb-3">Your position</p>
+      <div className="space-y-2 type-body-sm">
+        <div className="flex justify-between">
+          <span className="text-[color:var(--text-muted)]">Invested</span>
+          <span className="font-mono font-semibold">{"\u0192"}{position.totalInvested.toFixed(2)}</span>
+        </div>
+        {position.yesSharesHeld > 0 ? (
+          <div className="flex justify-between">
+            <span className="text-[color:var(--text-muted)]">Yes shares</span>
+            <span className="font-mono font-semibold">{position.yesSharesHeld.toFixed(2)}</span>
+          </div>
+        ) : null}
+        {position.noSharesHeld > 0 ? (
+          <div className="flex justify-between">
+            <span className="text-[color:var(--text-muted)]">No shares</span>
+            <span className="font-mono font-semibold">{position.noSharesHeld.toFixed(2)}</span>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function getLeadOutcome(outcomes: MarketOutcomeDto[]) {
   return outcomes.reduce<MarketOutcomeDto | undefined>((top, outcome) => {
     if (!top || outcome.probability > top.probability) {
@@ -830,43 +917,3 @@ function formatRelativeTimestamp(timestamp: string) {
   }).format(date);
 }
 
-function formatLedgerTimestamp(timestamp: string | null) {
-  if (!timestamp) {
-    return "No activity";
-  }
-
-  return formatRelativeTimestamp(timestamp);
-}
-
-function getOutcomeLabel(
-  market: MarketDto,
-  outcomeId: MarketOutcomeDto["outcomeId"],
-) {
-  return (
-    market.outcomes.find((outcome) => outcome.outcomeId === outcomeId)?.label ??
-    outcomeId
-  );
-}
-
-function hasMarketExposure(position?: MarketUserPositionDto) {
-  if (!position) {
-    return false;
-  }
-
-  return (
-    position.tradeCount > 0 ||
-    position.totalInvested > 0 ||
-    position.yesSharesHeld > 0 ||
-    position.noSharesHeld > 0
-  );
-}
-
-function formatShareCount(value: number) {
-  const shares = Number.isFinite(value) ? value : 0;
-  const formatted = new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 3,
-    minimumFractionDigits: shares > 0 && shares < 1 ? 3 : 0,
-  }).format(shares);
-
-  return `${formatted} share${shares === 1 ? "" : "s"}`;
-}

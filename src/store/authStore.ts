@@ -8,6 +8,7 @@ export interface AuthProfile {
   userId?: string | null;
   email?: string | null;
   pictureUrl?: string | null;
+  balance?: number | null;
 }
 
 export type AuthRole = "ADMIN" | "USER" | null;
