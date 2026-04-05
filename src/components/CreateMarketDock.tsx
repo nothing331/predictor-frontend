@@ -32,8 +32,8 @@ export default function CreateMarketDock({
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
   const role = AuthStore((state) => state.role);
-  const role = AuthStore((state) => state.role);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const isAdmin = isAdminSession(role);
 
   // Only ADMIN users can create markets
   if (!isAuthenticated || role !== "ADMIN") {

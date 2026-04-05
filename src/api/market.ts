@@ -170,28 +170,6 @@ export async function createMarket(payload: CreateMarketRequest) {
   return data;
 }
 
-export type ResolveMarketRequest = {
-  outcomeId: "YES" | "NO";
-};
-
-export type ResolveMarketResponse = {
-  status: string;
-  message: string;
-  marketId: string;
-  resolvedOutcome: "YES" | "NO";
-};
-
-export async function resolveMarket(
-  marketId: string,
-  payload: ResolveMarketRequest,
-) {
-  const { data } = await apiClient.post<ResolveMarketResponse>(
-    `/v1/markets/${encodeURIComponent(marketId)}/resolve`,
-    payload,
-  );
-  return data;
-}
-
 export type MarketPositionResponse = {
   userId: string;
   marketId: string;

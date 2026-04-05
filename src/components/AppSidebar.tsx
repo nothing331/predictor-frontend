@@ -4,11 +4,9 @@ import BrandMark from "./BrandMark";
 import { useAccountSummary } from "@/hooks/useAccount";
 import { AuthStore } from "../store/authStore";
 import {
-  hasApiBackedSession,
   isAdminSession,
   isSessionAuthenticated,
 } from "../utils/auth";
-import { formatFCoinAmount } from "../utils/currency";
 import UserProfileBadge from "./UserProfileBadge";
 
 const primaryNavItems = [
@@ -25,13 +23,8 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
   const expiresAt = AuthStore((state) => state.expiresAt);
   const profile = AuthStore((state) => state.profile);
   const role = AuthStore((state) => state.role);
-  const {
-    data: accountSummary,
-    isError: isAccountSummaryError,
-    isLoading: isAccountSummaryLoading,
-  } = useAccountSummary();
+  useAccountSummary();
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
-  const hasApiSession = hasApiBackedSession(accessToken);
   const isAdmin = isAdminSession(role);
   const navItems = isAuthenticated
     ? primaryNavItems

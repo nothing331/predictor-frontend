@@ -3,7 +3,6 @@ import AuthScaffold from "../components/AuthScaffold";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { AuthStore } from "../store/authStore";
 import { isSessionAuthenticated } from "../utils/auth";
-import { isSessionAuthenticated } from "../utils/auth";
 
 export default function CreateAccountPage() {
   const accessToken = AuthStore((state) => state.accessToken);
