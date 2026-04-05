@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getUserSummary } from "../api/user";
@@ -18,6 +18,7 @@ export default function HomePage() {
   const expiresAt = AuthStore((state) => state.expiresAt);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const allOpenCards = openMarkets.map(toHomeMarketCard);
@@ -52,6 +53,71 @@ export default function HomePage() {
       setActiveCategory("All");
     }
   }, [activeCategory, categories]);
+
+  useEffect(() => {
+    if (!isAdmin && activeMode === "ADMIN") {
+      setActiveMode("TRADE");
+    }
+  }, [activeMode, isAdmin]);
+
+  useEffect(() => {
+    const visibleIds = new Set(
+      filteredMarkets
+        .filter((market) => market.status === "OPEN")
+        .map((market) => market.marketId),
+    );
+
+    setSelectedResolutions((current) => {
+      const nextEntries = Object.entries(current).filter(([marketId]) =>
+        visibleIds.has(marketId),
+      );
+
+      if (nextEntries.length === Object.keys(current).length) {
+        return current;
+      }
+
+      return Object.fromEntries(nextEntries) as Record<string, ResolutionChoice>;
+    });
+  }, [filteredMarkets]);
+
+  function handleResolutionSelection(
+    marketId: string,
+    outcomeId: ResolutionChoice,
+  ) {
+    setSelectedResolutions((current) => {
+      if (current[marketId] === outcomeId) {
+        const next = { ...current };
+        delete next[marketId];
+        return next;
+      }
+
+      return {
+        ...current,
+        [marketId]: outcomeId,
+      };
+    });
+  }
+
+  function handleResolveMarket(marketId: string) {
+    const outcomeId = selectedResolutions[marketId];
+
+    if (!outcomeId) {
+      return;
+    }
+
+    resolveMarketMutation.mutate(
+      { marketId, outcomeId },
+      {
+        onSuccess: () => {
+          setSelectedResolutions((current) => {
+            const next = { ...current };
+            delete next[marketId];
+            return next;
+          });
+        },
+      },
+    );
+  }
 
   return (
     <div className="page-shell">

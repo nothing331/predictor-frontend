@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { isAxiosError } from "axios";
 import { Link, useParams } from "react-router-dom";
-import type { MarketDto, MarketHistoryPoint, MarketOutcomeDto } from "@/api/market";
+import type {
+  MarketDto,
+  MarketHistoryPoint,
+  MarketOutcomeDto,
+  MarketUserPositionDto,
+} from "@/api/market";
 import MarketHistoryChart from "@/components/MarketHistoryChart";
 import {
   buildHistoryPointKey,
@@ -16,13 +21,13 @@ import {
   formatProbability,
   getCategoryIcon,
   getMarketCategory,
-  getOutcomeIcon,
 } from "@/features/markets/marketPresentation";
 import { toHistoryPointFromTradeEvent } from "@/features/markets/marketEvents";
 import {
   getMarketPath,
   parseMarketIdParam,
 } from "@/features/markets/marketRoutes";
+import { useMarketPosition } from "@/hooks/useAccount";
 import { useMarketEventStream } from "@/hooks/useMarketEventStream";
 import { useMarketHistory } from "@/hooks/useMarketHistory";
 import { useMarketPosition } from "@/hooks/useMarketPosition";
@@ -52,13 +57,14 @@ export default function MarketPage() {
     isLoading,
     refetch,
   } = useMarket(marketId);
+  const marketPositionQuery = useMarketPosition(marketId);
   const [activeRange, setActiveRange] = useState<MarketHistoryRangePreset>("ALL");
   const {
     data: history,
     isError: isHistoryError,
     isLoading: isHistoryLoading,
     refetch: refetchHistory,
-  } = useMarketHistory(marketId, activeRange);
+  } = useMarketHistory(marketId, activeRange, market?.status === "OPEN");
   const tradeMutation = useCreateTrade(marketId);
   const { data: position } = useMarketPosition(marketId);
   const [selectedOutcome, setSelectedOutcome] =
@@ -158,6 +164,7 @@ export default function MarketPage() {
   }
 
   const category = getMarketCategory(market.category);
+  const isResolvedMarket = market.status === "RESOLVED";
   const marketIcon = getCategoryIcon(category);
   const leadOutcome = getLeadOutcome(market.outcomes);
   const resolvedLabel = getResolvedLabel(market);
@@ -178,12 +185,14 @@ export default function MarketPage() {
     isAuthenticated &&
     !!activeTradeOutcome &&
     amountValue > 0;
-  const chartStatus = getChartStatus({
-    hasHistory: combinedHistoryPoints.length > 0,
-    isHistoryLoading,
-    isStreamEnabled: streamEnabled,
-    streamStatus,
-  });
+  const chartStatus = isResolvedMarket
+    ? null
+    : getChartStatus({
+        hasHistory: combinedHistoryPoints.length > 0,
+        isHistoryLoading,
+        isStreamEnabled: streamEnabled,
+        streamStatus,
+      });
 
   return (
     <div className="page-shell">
@@ -257,19 +266,19 @@ export default function MarketPage() {
                   </div>
                 </div>
 
-                <div className="market-live-shell">
-                  <span className={`market-live-badge ${chartStatus.toneClass}`}>
-                    <span className="market-live-dot" />
-                    {chartStatus.label}
-                  </span>
-                  <div className="flex items-center gap-3 text-[color:var(--text-muted)]">
-                    <span className="material-symbols-outlined">event</span>
-                    <span className="material-symbols-outlined">forum</span>
-                    <span className="material-symbols-outlined">ios_share</span>
-                    <span className="material-symbols-outlined">download</span>
+                  <div className="market-live-shell">
+                    <span className={`market-live-badge ${chartStatus?.toneClass ?? ""}`}>
+                      <span className="market-live-dot" />
+                      {chartStatus?.label ?? "Snapshot mode"}
+                    </span>
+                    <div className="flex items-center gap-3 text-[color:var(--text-muted)]">
+                      <span className="material-symbols-outlined">event</span>
+                      <span className="material-symbols-outlined">forum</span>
+                      <span className="material-symbols-outlined">ios_share</span>
+                      <span className="material-symbols-outlined">download</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
               <div className="chart-surface h-52 w-full md:h-[26rem]">
                 {isHistoryLoading && !history ? (
@@ -546,6 +555,16 @@ export default function MarketPage() {
                 ) : null}
               </div>
             </section>
+
+            <MarketPositionPanel
+              isAuthenticated={isAuthenticated}
+              market={market}
+              onRetry={() => marketPositionQuery.refetch()}
+              position={marketPositionQuery.data}
+              tradeDestination={tradeDestination}
+              isError={marketPositionQuery.isError}
+              isLoading={marketPositionQuery.isLoading}
+            />
           </aside>
         </main>
 
@@ -809,4 +828,45 @@ function formatRelativeTimestamp(timestamp: string) {
     minute: "2-digit",
     month: "short",
   }).format(date);
+}
+
+function formatLedgerTimestamp(timestamp: string | null) {
+  if (!timestamp) {
+    return "No activity";
+  }
+
+  return formatRelativeTimestamp(timestamp);
+}
+
+function getOutcomeLabel(
+  market: MarketDto,
+  outcomeId: MarketOutcomeDto["outcomeId"],
+) {
+  return (
+    market.outcomes.find((outcome) => outcome.outcomeId === outcomeId)?.label ??
+    outcomeId
+  );
+}
+
+function hasMarketExposure(position?: MarketUserPositionDto) {
+  if (!position) {
+    return false;
+  }
+
+  return (
+    position.tradeCount > 0 ||
+    position.totalInvested > 0 ||
+    position.yesSharesHeld > 0 ||
+    position.noSharesHeld > 0
+  );
+}
+
+function formatShareCount(value: number) {
+  const shares = Number.isFinite(value) ? value : 0;
+  const formatted = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 3,
+    minimumFractionDigits: shares > 0 && shares < 1 ? 3 : 0,
+  }).format(shares);
+
+  return `${formatted} share${shares === 1 ? "" : "s"}`;
 }

@@ -7,6 +7,7 @@ import CreateAccountPage from "./pages/CreateAccountPage";
 import MarketPage from "./pages/MarketPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import { MARKET_ROUTE_PATTERN } from "./features/markets/marketRoutes";
+import { useCurrentUserBootstrap } from "./hooks/useAccount";
 
 export default function App() {
   // Hydrate user data (balance, role, gift status) when authenticated

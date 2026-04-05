@@ -1,12 +1,16 @@
 // src/store/authStore.ts (Zustand)
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { decodeJwtPayload, getSessionRole } from "../utils/auth";
 
 export interface AuthProfile {
   name: string;
+  userId?: string | null;
   email?: string | null;
   pictureUrl?: string | null;
 }
+
+export type AuthRole = "ADMIN" | "USER" | null;
 
 interface AuthState {
   accessToken: string | null;
@@ -51,11 +55,14 @@ export const AuthStore = create<AuthState>()(
       nextGiftAt: null,
 
       saveAuth: (accessToken, refreshToken, expiresInSeconds, profile) => {
+        const payload = decodeJwtPayload<{ role?: string }>(accessToken);
+
         set({
           accessToken,
           refreshToken,
           expiresAt: Date.now() + expiresInSeconds * 1000,
           profile: profile !== undefined ? profile : get().profile,
+          role: getSessionRole(payload?.role),
         });
       },
 

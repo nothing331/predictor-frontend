@@ -5,15 +5,20 @@ import {
   resolveMarket,
   getMarketById,
   getMarkets,
+  resolveMarket,
   type CreateTradeRequest,
   type CreateMarketRequest,
   type ResolveMarketRequest,
+  type ResolveMarketRequest,
 } from "@/api/market";
+import { AuthStore } from "@/store/authStore";
 import { ErrorStore } from "@/store/errorStore";
+import { isAdminSession } from "@/utils/auth";
+import { formatFCoinAmount } from "@/utils/currency";
 
-export function useMarkets(status: "OPEN" | "RESOLVED" = "OPEN") {
+export function useMarkets(status?: "OPEN" | "RESOLVED") {
   return useQuery({
-    queryKey: ["markets", { status }],
+    queryKey: ["markets", { status: status ?? "ALL" }],
     queryFn: () => getMarkets(status),
   });
 }
@@ -30,7 +35,13 @@ export function useCreateMarket() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateMarketRequest) => createMarket(payload),
+    mutationFn: async (payload: CreateMarketRequest) => {
+      if (!isAdminSession(AuthStore.getState().role)) {
+        throw new Error("Admin access is required to create markets.");
+      }
+
+      return createMarket(payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["markets"] });
       ErrorStore.getState().pushToast({
@@ -56,6 +67,29 @@ export function useCreateTrade(marketId: string) {
       ErrorStore.getState().pushToast({
         title: "Trade executed",
         message: `Bought ${trade.sharesBought.toFixed(3)} shares of ${trade.outcome} for ${formatCurrency(trade.cost)}.`,
+        tone: "info",
+      });
+    },
+  });
+}
+
+export function useResolveMarket() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      marketId,
+      payload,
+    }: {
+      marketId: string;
+      payload: ResolveMarketRequest;
+    }) => resolveMarket(marketId, payload),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["markets"] });
+      queryClient.invalidateQueries({ queryKey: ["market", result.marketId] });
+      ErrorStore.getState().pushToast({
+        title: "Market resolved",
+        message: `Resolved to ${result.resolvedOutcome}.`,
         tone: "info",
       });
     },

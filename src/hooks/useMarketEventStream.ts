@@ -86,7 +86,7 @@ export function useMarketEventStream({
       scheduleLiveDelay();
 
       const eventSource = new EventSource(
-        `${API_BASE_URL}/v1/stream/events?marketId=${encodeURIComponent(marketId)}`,
+        `${API_BASE_URL}v1/stream/events?marketId=${encodeURIComponent(marketId)}`,
       );
 
       activeStream = eventSource;

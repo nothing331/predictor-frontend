@@ -13,6 +13,7 @@ export type HomeMarketCard = {
   title: string;
   category: string;
   icon: string;
+  status: "OPEN" | "RESOLVED";
   volume: string;
   statusLabel: string;
   outcomes: {
@@ -33,6 +34,7 @@ export function toHomeMarketCard(market: MarketDto): HomeMarketCard {
     title: market.marketName,
     category,
     icon: getCategoryIcon(category),
+    status: market.status,
     volume: `${formatCompactCurrency(market.totalValue)} vol`,
     statusLabel: market.status === "OPEN" ? "Live market" : "Resolved",
     outcomes: market.outcomes.map((outcome, index) => ({

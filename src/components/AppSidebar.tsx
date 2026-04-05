@@ -1,8 +1,14 @@
 import { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import BrandMark from "./BrandMark";
+import { useAccountSummary } from "@/hooks/useAccount";
 import { AuthStore } from "../store/authStore";
-import { isSessionAuthenticated } from "../utils/auth";
+import {
+  hasApiBackedSession,
+  isAdminSession,
+  isSessionAuthenticated,
+} from "../utils/auth";
+import { formatFCoinAmount } from "../utils/currency";
 import UserProfileBadge from "./UserProfileBadge";
 
 const primaryNavItems = [
@@ -18,7 +24,15 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
   const profile = AuthStore((state) => state.profile);
+  const role = AuthStore((state) => state.role);
+  const {
+    data: accountSummary,
+    isError: isAccountSummaryError,
+    isLoading: isAccountSummaryLoading,
+  } = useAccountSummary();
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const hasApiSession = hasApiBackedSession(accessToken);
+  const isAdmin = isAdminSession(role);
   const navItems = isAuthenticated
     ? primaryNavItems
     : [
@@ -49,10 +63,12 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
       {isAuthenticated ? <UserProfileBadge compact profile={profile} /> : null}
 
       <div className="mt-auto flex flex-col gap-4 border-t border-[var(--border-soft)] pt-6">
-        <button className="action-secondary w-full">
-          <span className="material-symbols-outlined">add_circle</span>
-          Create Market
-        </button>
+        {isAdmin ? (
+          <button className="action-secondary w-full">
+            <span className="material-symbols-outlined">add_circle</span>
+            Create Market
+          </button>
+        ) : null}
 
         {footer ?? null}
       </div>

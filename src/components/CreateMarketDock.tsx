@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { AuthStore } from "@/store/authStore";
-import { isSessionAuthenticated } from "@/utils/auth";
+import { isAdminSession, isSessionAuthenticated } from "@/utils/auth";
 import { useCreateMarket } from "@/hooks/useMarkets";
 
 type CreateMarketDockProps = {
@@ -32,6 +32,7 @@ export default function CreateMarketDock({
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
   const role = AuthStore((state) => state.role);
+  const role = AuthStore((state) => state.role);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
 
   // Only ADMIN users can create markets
@@ -55,6 +56,11 @@ export default function CreateMarketDock({
 
     if (!isAuthenticated) {
       setErrorMessage("Sign in to launch a new market.");
+      return;
+    }
+
+    if (!isAdmin) {
+      setErrorMessage("Admin access is required to launch a market.");
       return;
     }
 
