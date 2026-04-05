@@ -53,6 +53,13 @@ export async function demoRegister(
   return data;
 }
 
+export async function refreshTokens(refreshToken: string) {
+  const { data } = await apiClient.post<TokenResponse>("/v1/auth/refresh", {
+    refreshToken,
+  });
+  return data;
+}
+
 export async function fetchAuthMe() {
   const { data } = await apiClient.get<AuthMeResponse>("/v1/auth/me");
   return data;
