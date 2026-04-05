@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import BrandMark from "./BrandMark";
 
 type AuthScaffoldProps = {
@@ -19,7 +20,16 @@ export default function AuthScaffold({
       <div className="page-content auth-stage">
         <section className="auth-card app-panel-subtle w-full">
           <div className="auth-card-header px-6 py-7 md:px-8 md:py-8">
-            <BrandMark caption="Account access" />
+            <div className="flex items-center justify-between gap-4">
+              <BrandMark />
+              <Link
+                className="eyebrow text-[inherit] no-underline flex items-center gap-1"
+                to="/"
+              >
+                Browse markets
+                <span className="material-symbols-outlined text-[1rem]">arrow_forward</span>
+              </Link>
+            </div>
 
             <div className="space-y-3">
               <p className="eyebrow">{eyebrow}</p>

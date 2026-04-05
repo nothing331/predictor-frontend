@@ -4,11 +4,9 @@ import BrandMark from "./BrandMark";
 import { useAccountSummary } from "@/hooks/useAccount";
 import { AuthStore } from "../store/authStore";
 import {
-  hasApiBackedSession,
   isAdminSession,
   isSessionAuthenticated,
 } from "../utils/auth";
-import { formatFCoinAmount } from "../utils/currency";
 import UserProfileBadge from "./UserProfileBadge";
 
 const primaryNavItems = [
@@ -25,13 +23,8 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
   const expiresAt = AuthStore((state) => state.expiresAt);
   const profile = AuthStore((state) => state.profile);
   const role = AuthStore((state) => state.role);
-  const {
-    data: accountSummary,
-    isError: isAccountSummaryError,
-    isLoading: isAccountSummaryLoading,
-  } = useAccountSummary();
+  useAccountSummary();
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
-  const hasApiSession = hasApiBackedSession(accessToken);
   const isAdmin = isAdminSession(role);
   const navItems = isAuthenticated
     ? primaryNavItems
@@ -70,39 +63,7 @@ export default function AppSidebar({ footer }: AppSidebarProps) {
           </button>
         ) : null}
 
-        {footer ?? (
-          <div className="app-panel app-panel-soft p-4">
-            <p className="eyebrow mb-3">Balance</p>
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="metric-value text-primary">
-                  {formatFCoinAmount(accountSummary?.availableBalance ?? 0, {
-                    compact: (accountSummary?.availableBalance ?? 0) >= 1000,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-                <p className="muted-copy type-body-sm">
-                  {!isAuthenticated
-                    ? "Sign in to sync your live desk balance."
-                    : !hasApiSession
-                      ? "Balance sync is available with a live backend session."
-                      : isAccountSummaryLoading
-                        ? "Syncing account summary..."
-                        : isAccountSummaryError
-                          ? "Account summary is temporarily unavailable."
-                          : accountSummary && accountSummary.recentMarkets.length > 0
-                            ? `${accountSummary.recentMarkets.length} recent market${
-                                accountSummary.recentMarkets.length === 1 ? "" : "s"
-                              }`
-                            : "No recent markets yet"}
-                </p>
-              </div>
-              {isAuthenticated && hasApiSession && !isAccountSummaryLoading ? (
-                <span className="chip chip-soft">Cash only</span>
-              ) : null}
-            </div>
-          </div>
-        )}
+        {footer ?? null}
       </div>
     </aside>
   );

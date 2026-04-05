@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 
 type BrandMarkProps = {
-  caption?: string;
   to?: string;
 };
 
 export default function BrandMark({
-  caption = "Signal-led prediction exchange",
   to = "/",
 }: BrandMarkProps) {
   return (
@@ -18,7 +16,6 @@ export default function BrandMark({
       </span>
       <span className="min-w-0">
         <span className="brand-wordmark block">PredictKaro</span>
-        <span className="eyebrow block mt-2">{caption}</span>
       </span>
     </Link>
   );

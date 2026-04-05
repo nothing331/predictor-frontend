@@ -6,11 +6,10 @@ import {
   type AccountSummaryDto,
 } from "@/api/account";
 import { getCurrentUserMarketPosition } from "@/api/market";
-import { getCurrentUser, type CurrentUserResponse } from "@/api/auth";
+import { fetchAuthMe, type AuthMeResponse } from "@/api/auth";
 import { AuthStore } from "@/store/authStore";
 import { ErrorStore } from "@/store/errorStore";
 import {
-  getSessionRole,
   hasApiBackedSession,
   isSessionAuthenticated,
   normalizeProfile,
@@ -30,7 +29,7 @@ function useAuthenticatedSessionState() {
 
 export function useCurrentUserBootstrap() {
   const saveProfile = AuthStore((state) => state.saveProfile);
-  const setRole = AuthStore((state) => state.setRole);
+  const saveUserData = AuthStore((state) => state.saveUserData);
   const query = useCurrentUserStatus();
 
   useEffect(() => {
@@ -38,17 +37,22 @@ export function useCurrentUserBootstrap() {
       return;
     }
 
-    saveProfile(
-      normalizeProfile({
-        balance: query.data.balance,
-        email: query.data.email ?? undefined,
-        name: query.data.name ?? undefined,
-        pictureUrl: query.data.pictureUrl ?? undefined,
-        userId: query.data.userId ?? undefined,
-      }),
-    );
-    setRole(getSessionRole(query.data.role));
-  }, [query.data, saveProfile, setRole]);
+    const profile = normalizeProfile({
+      balance: query.data.balance,
+      email: query.data.email ?? undefined,
+      name: query.data.name ?? undefined,
+      pictureUrl: query.data.pictureUrl ?? undefined,
+      userId: query.data.userId ?? undefined,
+    });
+    saveProfile(profile);
+    saveUserData({
+      balance: query.data.balance,
+      role: query.data.role,
+      giftAvailable: query.data.giftAvailable,
+      nextGiftAt: query.data.nextGiftAt,
+      profile,
+    });
+  }, [query.data, saveProfile, saveUserData]);
 
   return query;
 }
@@ -59,7 +63,7 @@ export function useCurrentUserStatus() {
   return useQuery({
     enabled: hasApiSession,
     queryKey: ["auth", "me"],
-    queryFn: () => getCurrentUser(),
+    queryFn: () => fetchAuthMe(),
   });
 }
 
@@ -89,9 +93,9 @@ export function useGiftClaim() {
   return useMutation({
     mutationFn: () => claimGift(),
     onSuccess: (gift) => {
-      queryClient.setQueryData<CurrentUserResponse | undefined>(
+      queryClient.setQueryData<AuthMeResponse | undefined>(
         ["auth", "me"],
-        (current) =>
+        (current: AuthMeResponse | undefined) =>
           current
             ? {
                 ...current,

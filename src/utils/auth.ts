@@ -1,6 +1,6 @@
 import type { AuthProfile, AuthRole } from "../store/authStore";
 
-const fallbackProfileName = "Desk User";
+const fallbackProfileName = "User";
 
 type NormalizableProfile = Partial<AuthProfile> & {
   balance?: number | null;

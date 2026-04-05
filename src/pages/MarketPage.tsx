@@ -33,20 +33,14 @@ import { useMarketHistory } from "@/hooks/useMarketHistory";
 import { useCreateTrade, useMarket } from "@/hooks/useMarkets";
 import { AuthStore } from "@/store/authStore";
 import { isSessionAuthenticated } from "@/utils/auth";
-import {
-  FCoinSymbol,
-  formatFCoinAmount,
-  formatFCoinDelta,
-} from "@/utils/currency";
-import BrandMark from "../components/BrandMark";
-import HeaderAccountActions from "../components/HeaderAccountActions";
+import AppHeader from "../components/AppHeader";
+import SiteFooter from "../components/SiteFooter";
 
-const categories = ["All", "Politics", "Tech", "Sports", "Crypto"];
 const quickAmounts = [
-  { amount: 1, label: formatFCoinDelta(1, { maximumFractionDigits: 0 }) },
-  { amount: 5, label: formatFCoinDelta(5, { maximumFractionDigits: 0 }) },
-  { amount: 10, label: formatFCoinDelta(10, { maximumFractionDigits: 0 }) },
-  { amount: 100, label: formatFCoinDelta(100, { maximumFractionDigits: 0 }) },
+  { amount: 1, label: "+\u01921" },
+  { amount: 5, label: "+\u01925" },
+  { amount: 10, label: "+\u019210" },
+  { amount: 100, label: "+\u0192100" },
 ];
 
 export default function MarketPage() {
@@ -71,6 +65,7 @@ export default function MarketPage() {
     refetch: refetchHistory,
   } = useMarketHistory(marketId, activeRange, market?.status === "OPEN");
   const tradeMutation = useCreateTrade(marketId);
+  const { data: position } = useMarketPosition(marketId);
   const [selectedOutcome, setSelectedOutcome] =
     useState<MarketOutcomeDto["outcomeId"] | null>(null);
   const [amountInput, setAmountInput] = useState("");
@@ -170,7 +165,6 @@ export default function MarketPage() {
   const category = getMarketCategory(market.category);
   const isResolvedMarket = market.status === "RESOLVED";
   const marketIcon = getCategoryIcon(category);
-  const descriptionBlocks = buildDescriptionBlocks(market);
   const leadOutcome = getLeadOutcome(market.outcomes);
   const resolvedLabel = getResolvedLabel(market);
   const tradeDestination = `/login?redirectTo=${encodeURIComponent(
@@ -202,114 +196,74 @@ export default function MarketPage() {
   return (
     <div className="page-shell">
       <div className="page-content">
-        <header className="surface-line mb-8 pb-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <BrandMark caption="Live market detail" />
+        <AppHeader />
 
-            <div className="flex flex-1 flex-col gap-5 xl:max-w-5xl xl:flex-row xl:items-center xl:justify-end">
-              <label className="app-panel-subtle field-shell search-shell flex-1">
-                <span className="material-symbols-outlined">search</span>
-                <input
-                  className="app-input search-input uppercase"
-                  placeholder="Search markets, creators, or topics"
-                  type="text"
-                />
-              </label>
-
-              <div className="flex flex-wrap gap-2">
-                {categories.map((entry) => (
-                  <button
-                    key={entry}
-                    className={`chip ${
-                      entry === category ? "chip-primary" : "chip-soft"
-                    } ${entry === category ? "" : "!border-transparent !bg-transparent"}`}
-                    type="button"
-                  >
-                    {entry}
-                  </button>
-                ))}
-              </div>
-
-              <HeaderAccountActions />
-            </div>
-          </div>
-        </header>
-
-        <main className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_328px] 2xl:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="min-w-0 space-y-8">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
+        <main className="grid gap-5 md:gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="min-w-0 space-y-5 md:space-y-8">
+            <div className="space-y-3 md:space-y-4">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3">
                 <Link
-                  className="eyebrow text-[inherit] no-underline"
+                  className="eyebrow text-[inherit] no-underline flex items-center gap-1"
                   to="/"
                 >
-                  Back to board
+                  <span className="material-symbols-outlined text-[1rem]">arrow_back</span>
+                  All markets
                 </Link>
                 <span className="eyebrow">{category}</span>
                 <span className="eyebrow">
-                  {market.status === "OPEN" ? "Open market" : "Resolved market"}
+                  {market.status === "OPEN" ? "Open" : "Resolved"}
                 </span>
-                <span className="eyebrow">ID {shortenMarketId(market.marketId)}</span>
               </div>
 
-              <div className="flex items-start gap-5">
-                <span className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl bg-primary text-[#16130f]">
-                  <span className="material-symbols-outlined text-[2rem]">
+              <div className="flex items-start gap-3 md:gap-5">
+                <span className="flex h-10 w-10 md:h-16 md:w-16 flex-none items-center justify-center rounded-xl md:rounded-2xl bg-primary text-[#16130f]">
+                  <span className="material-symbols-outlined text-[1.25rem] md:text-[2rem]">
                     {marketIcon}
                   </span>
                 </span>
 
                 <div className="min-w-0">
                   <h1 className="display-title">{market.marketName}</h1>
-                  <p className="muted-copy mt-4 max-w-3xl type-body-md">
-                    Market ID: {market.marketId}
-                  </p>
                 </div>
               </div>
             </div>
 
-            {isResolvedMarket ? (
-              <ResolvedMarketSummary
-                market={market}
-                resolvedLabel={resolvedLabel}
-              />
-            ) : (
-              <section className="app-panel-subtle overflow-hidden px-5 py-6 md:px-8 md:py-8">
-                <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-                  <div className="space-y-3">
-                    <p className="eyebrow">Price history</p>
-                    <div className="market-history-summary">
-                      {market.outcomes.map((outcome) => (
-                        <article
-                          key={outcome.outcomeId}
-                          className={`market-history-signal ${
-                            outcome.outcomeId === "YES"
-                              ? "market-history-signal-yes"
-                              : "market-history-signal-no"
-                          }`}
-                        >
-                          <span className="eyebrow">{outcome.label}</span>
-                          <strong className="market-history-signal-value">
-                            {latestHistoryPoint
-                              ? formatProbability(
-                                  outcome.outcomeId === "YES"
-                                    ? latestHistoryPoint.yesProbability
-                                    : latestHistoryPoint.noProbability,
-                                )
-                              : formatProbability(outcome.probability)}
-                          </strong>
-                        </article>
-                      ))}
-                      <article className="market-history-meta">
-                        <span className="eyebrow">Last update</span>
-                        <strong className="market-history-meta-value">
+            <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-8 md:py-8">
+              <div className="mb-4 md:mb-6 flex flex-wrap items-start justify-between gap-3 md:gap-4">
+                <div className="space-y-2 md:space-y-3">
+                  <p className="eyebrow">Price history</p>
+                  <div className="market-history-summary">
+                    {market.outcomes.map((outcome) => (
+                      <article
+                        key={outcome.outcomeId}
+                        className={`market-history-signal ${
+                          outcome.outcomeId === "YES"
+                            ? "market-history-signal-yes"
+                            : "market-history-signal-no"
+                        }`}
+                      >
+                        <span className="eyebrow">{outcome.label}</span>
+                        <strong className="market-history-signal-value">
                           {latestHistoryPoint
-                            ? formatRelativeTimestamp(latestHistoryPoint.timestamp)
-                            : "Waiting for history"}
+                            ? formatProbability(
+                                outcome.outcomeId === "YES"
+                                  ? latestHistoryPoint.yesProbability
+                                  : latestHistoryPoint.noProbability,
+                              )
+                            : formatProbability(outcome.probability)}
                         </strong>
                       </article>
-                    </div>
+                    ))}
+                    <article className="market-history-meta">
+                      <span className="eyebrow">Last update</span>
+                      <strong className="market-history-meta-value">
+                        {latestHistoryPoint
+                          ? formatRelativeTimestamp(latestHistoryPoint.timestamp)
+                          : "Waiting for history"}
+                      </strong>
+                    </article>
                   </div>
+                </div>
 
                   <div className="market-live-shell">
                     <span className={`market-live-badge ${chartStatus?.toneClass ?? ""}`}>
@@ -325,58 +279,99 @@ export default function MarketPage() {
                   </div>
                 </div>
 
-                <div className="chart-surface h-80 w-full md:h-[26rem]">
-                  {isHistoryLoading && !history ? (
-                    <ChartHistoryLoading />
-                  ) : isHistoryError && !history ? (
-                    <ChartHistoryError onRetry={() => refetchHistory()} />
-                  ) : combinedHistoryPoints.length > 0 ? (
-                    <MarketHistoryChart points={combinedHistoryPoints} />
-                  ) : (
-                    <ChartHistoryEmpty />
-                  )}
+              <div className="chart-surface h-52 w-full md:h-[26rem]">
+                {isHistoryLoading && !history ? (
+                  <ChartHistoryLoading />
+                ) : isHistoryError && !history ? (
+                  <ChartHistoryError onRetry={() => refetchHistory()} />
+                ) : combinedHistoryPoints.length > 0 ? (
+                  <MarketHistoryChart points={combinedHistoryPoints} />
+                ) : (
+                  <ChartHistoryEmpty />
+                )}
+              </div>
+
+              <div className="mt-3 md:mt-4 flex flex-wrap items-center justify-between gap-3 md:gap-4">
+                <span className="muted-copy type-body-sm">
+                  {formatCompactCurrency(market.totalValue)} volume
+                </span>
+
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
+                  {marketHistoryRangeOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      className={`chip ${
+                        activeRange === option.id
+                          ? "chip-primary"
+                          : "chip-soft !border-transparent !bg-transparent"
+                      }`}
+                      onClick={() => setActiveRange(option.id)}
+                      type="button"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
+              </div>
+            </section>
 
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-                  <span className="muted-copy">
-                    {formatCompactCurrency(market.totalValue)} vol ·{" "}
-                    {combinedHistoryPoints.length} plotted points
-                  </span>
+            <section className="app-panel-subtle overflow-hidden">
+              <div className="surface-line type-body-sm grid grid-cols-[minmax(0,1fr)_80px] md:grid-cols-[minmax(0,1fr)_120px] gap-3 md:gap-4 px-3.5 py-3 md:px-8 md:py-4">
+                <span className="eyebrow">Outcome</span>
+                <span className="eyebrow text-center">Chance</span>
+              </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    {marketHistoryRangeOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        className={`chip ${
-                          activeRange === option.id
-                            ? "chip-primary"
-                            : "chip-soft !border-transparent !bg-transparent"
+              {market.outcomes.map((outcome, index) => (
+                <article
+                  key={outcome.outcomeId}
+                  className="surface-line last:border-b-0 grid grid-cols-[minmax(0,1fr)_80px] md:grid-cols-[minmax(0,1fr)_120px] items-center gap-3 md:gap-4 px-3.5 py-3.5 md:px-8 md:py-5"
+                >
+                  <div className="flex min-w-0 items-center gap-3 md:gap-4">
+                    <span
+                      className="flex h-8 w-8 md:h-11 md:w-11 flex-none items-center justify-center rounded-full text-[color:var(--text-strong)]"
+                      style={{
+                        background:
+                          "color-mix(in srgb, var(--surface-soft) 78%, transparent)",
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[1.25rem]">
+                        {getOutcomeIcon(outcome.outcomeId, index)}
+                      </span>
+                    </span>
+
+                    <div className="min-w-0">
+                      <p className="type-body-lg truncate font-medium">
+                        {outcome.label}
+                      </p>
+                      <div
+                        className={`mt-2 h-[2px] w-14 rounded-full ${
+                          index === 0 ? "bg-primary" : "bg-secondary"
                         }`}
-                        onClick={() => setActiveRange(option.id)}
-                        type="button"
-                      >
-                        {option.label}
-                      </button>
-                    ))}
+                      />
+                    </div>
                   </div>
-                </div>
-              </section>
-            )}
+
+                  <span className="type-heading-sm text-center font-mono font-semibold">
+                    {formatProbability(outcome.probability)}
+                  </span>
+                </article>
+              ))}
+            </section>
           </section>
 
-          <aside className="space-y-4 xl:sticky xl:top-6 xl:self-start">
+          <aside className="lg:sticky lg:top-6 lg:self-start">
             <section className="app-panel-subtle overflow-hidden">
-              <div className="px-5 py-6 md:px-6">
-                <div className="mb-5 flex items-start gap-4">
-                  <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-primary text-[#16130f]">
-                    <span className="material-symbols-outlined text-[2rem]">
+              <div className="px-3.5 py-4 md:px-6 md:py-6">
+                <div className="mb-4 md:mb-5 flex items-start gap-3 md:gap-4">
+                  <span className="flex h-10 w-10 md:h-14 md:w-14 flex-none items-center justify-center rounded-xl md:rounded-2xl bg-primary text-[#16130f]">
+                    <span className="material-symbols-outlined text-[1.25rem] md:text-[2rem]">
                       {marketIcon}
                     </span>
                   </span>
 
                   <div>
                     <p className="muted-copy type-body-sm">{market.marketName}</p>
-                    <p className="type-heading-sm mt-2 text-primary">
+                    <p className="type-heading-sm mt-1 md:mt-2 text-primary">
                       {market.status === "OPEN"
                         ? `Buy ${leadOutcome?.label ?? "Outcome"}`
                         : resolvedLabel}
@@ -384,18 +379,7 @@ export default function MarketPage() {
                   </div>
                 </div>
 
-                <div className="mb-5 flex items-center justify-between gap-4">
-                  <div className="flex gap-2">
-                    <button className="chip chip-primary" type="button">
-                      {market.status === "OPEN" ? "Buy" : "Resolved"}
-                    </button>
-                  </div>
-                  <span className="eyebrow">
-                    {market.status === "OPEN" ? "" : resolvedLabel}
-                  </span>
-                </div>
-
-                <div className="mb-5 grid grid-cols-2 gap-3">
+                <div className="mb-4 md:mb-5 grid grid-cols-2 gap-2 md:gap-3">
                   {market.outcomes.slice(0, 2).map((outcome) => (
                     <button
                       key={outcome.outcomeId}
@@ -417,10 +401,10 @@ export default function MarketPage() {
                   ))}
                 </div>
 
-                <label className="mb-5 block">
-                  <span className="eyebrow mb-3 block">Amount</span>
+                <label className="mb-4 md:mb-5 block">
+                  <span className="eyebrow mb-2 md:mb-3 block">Amount</span>
                   <div className="app-panel-subtle field-shell trade-amount-shell">
-                    <span className="trade-amount-prefix">{FCoinSymbol}</span>
+                    <span className="trade-amount-prefix">{"\u0192"}</span>
                     <input
                       className="app-input type-value-lg font-mono font-semibold"
                       inputMode="decimal"
@@ -434,7 +418,7 @@ export default function MarketPage() {
                   </div>
                 </label>
 
-                <div className="mb-5 flex flex-wrap gap-2">
+                <div className="mb-4 md:mb-5 flex flex-wrap gap-1.5 md:gap-2">
                   {quickAmounts.map((quickAmount) => (
                     <button
                       key={quickAmount.label}
@@ -450,11 +434,6 @@ export default function MarketPage() {
                     </button>
                   ))}
                 </div>
-
-                <p className="muted-copy mb-5 type-body-sm">
-                  The backend prices this as a budget order. Enter amount,
-                  pick an outcome, and the server computes shares for you.
-                </p>
 
                 {market.status !== "OPEN" ? (
                   <button
@@ -503,6 +482,76 @@ export default function MarketPage() {
                     Sign in to trade
                   </Link>
                 )}
+
+                {isAuthenticated && position && position.tradeCount > 0 ? (
+                  <div className="mt-4 md:mt-6 space-y-3 md:space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[1.25rem]">trending_up</span>
+                      <p className="type-heading-sm uppercase">Your Position</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="app-panel-subtle px-4 py-3"
+                        style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent)" }}
+                      >
+                        <p className="eyebrow mb-1">Invested</p>
+                        <p className="type-heading-md font-mono font-bold">
+                          {"\u0192"}{position.totalInvested.toFixed(2)}
+                        </p>
+                      </div>
+
+                      <div className="app-panel-subtle px-4 py-3"
+                        style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--color-secondary) 12%, transparent), transparent)" }}
+                      >
+                        <p className="eyebrow mb-1">Trades</p>
+                        <p className="type-heading-md font-mono font-bold">
+                          {position.tradeCount}
+                        </p>
+                      </div>
+                    </div>
+
+                    {position.yesSharesHeld > 0 ? (
+                      <div className="app-panel-subtle px-4 py-3 flex items-center justify-between"
+                        style={{ borderLeft: "4px solid var(--color-primary)" }}
+                      >
+                        <div>
+                          <p className="eyebrow mb-1">Yes shares</p>
+                          <p className="type-body-lg font-mono font-bold">{position.yesSharesHeld.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="eyebrow mb-1">Payout</p>
+                          <p className="type-body-lg font-mono font-bold text-primary">{"\u0192"}{position.projectedPayoutIfYes.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {position.noSharesHeld > 0 ? (
+                      <div className="app-panel-subtle px-4 py-3 flex items-center justify-between"
+                        style={{ borderLeft: "4px solid var(--color-secondary)" }}
+                      >
+                        <div>
+                          <p className="eyebrow mb-1">No shares</p>
+                          <p className="type-body-lg font-mono font-bold">{position.noSharesHeld.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="eyebrow mb-1">Payout</p>
+                          <p className="type-body-lg font-mono font-bold text-secondary">{"\u0192"}{position.projectedPayoutIfNo.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {position.realizedNetPnl !== null ? (
+                      <div className={`app-panel-subtle px-4 py-3 text-center ${position.realizedNetPnl >= 0 ? "status-positive" : "status-negative"}`}
+                        style={{ borderLeft: `4px solid ${position.realizedNetPnl >= 0 ? "var(--color-accent-green)" : "var(--color-accent-red)"}` }}
+                      >
+                        <p className="eyebrow mb-1">Realized P&L</p>
+                        <p className="type-heading-md font-mono font-bold">
+                          {position.realizedNetPnl >= 0 ? "+" : ""}{"\u0192"}{position.realizedNetPnl.toFixed(2)}
+                        </p>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
             </section>
 
@@ -518,23 +567,20 @@ export default function MarketPage() {
           </aside>
         </main>
 
-        <section className="section-divider mt-10 pt-8">
-          <div className="app-panel-subtle px-5 py-6 md:px-8 md:py-8">
-            <p className="eyebrow mb-3">Market description</p>
-            <h2 className="section-title mb-5">Resolution rules</h2>
+        {market.description ? (
+          <section className="section-divider mt-6 pt-5 md:mt-10 md:pt-8">
+            <div className="app-panel-subtle px-3.5 py-4 md:px-8 md:py-8">
+              <p className="eyebrow mb-2 md:mb-3">About this market</p>
+              <h2 className="section-title mb-3 md:mb-5">Resolution rules</h2>
 
-            <div className="space-y-4">
-              {descriptionBlocks.map((block) => (
-                <p
-                  key={block}
-                  className="max-w-4xl leading-relaxed text-[color:var(--text-muted)]"
-                >
-                  {block}
-                </p>
-              ))}
+              <p className="max-w-4xl leading-relaxed text-[color:var(--text-muted)]">
+                {market.description}
+              </p>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
+
+        <SiteFooter />
       </div>
     </div>
   );
@@ -544,20 +590,15 @@ function MarketPageSkeleton() {
   return (
     <div className="page-shell">
       <div className="page-content">
-        <header className="surface-line mb-8 pb-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <BrandMark caption="Live market detail" />
-            <div className="app-panel-subtle h-14 w-full max-w-4xl animate-pulse" />
-          </div>
-        </header>
+        <AppHeader />
 
-        <main className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_328px] 2xl:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="space-y-8">
-            <div className="app-panel-subtle h-40 animate-pulse" />
-            <div className="app-panel-subtle h-[34rem] animate-pulse" />
-            <div className="app-panel-subtle h-[24rem] animate-pulse" />
+        <main className="grid gap-5 md:gap-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="space-y-5 md:space-y-8">
+            <div className="app-panel-subtle h-28 md:h-40 animate-pulse" />
+            <div className="app-panel-subtle h-64 md:h-[34rem] animate-pulse" />
+            <div className="app-panel-subtle h-40 md:h-[24rem] animate-pulse" />
           </section>
-          <aside className="app-panel-subtle h-[32rem] animate-pulse" />
+          <aside className="app-panel-subtle h-72 md:h-[32rem] animate-pulse" />
         </main>
       </div>
     </div>
@@ -569,20 +610,19 @@ function MarketPageError({ onRetry }: { onRetry: () => void }) {
     <div className="page-shell">
       <div className="page-content">
         <section className="market-state-card app-panel-subtle px-6 py-7 md:px-8 md:py-8">
-          <p className="eyebrow">Market unavailable</p>
+          <p className="eyebrow">Error</p>
           <h1 className="type-heading-sm mt-3 uppercase">
-            We could not load this market
+            Could not load this market
           </h1>
           <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
-            The detail endpoint did not return a usable response. Retry the
-            market fetch or go back to the home board.
+            Something went wrong. Please try again or go back.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <button className="action-secondary" type="button" onClick={onRetry}>
               Retry detail
             </button>
             <Link className="chip chip-soft text-[inherit] no-underline" to="/">
-              Back to board
+              All markets
             </Link>
           </div>
         </section>
@@ -596,17 +636,17 @@ function MarketNotFound({ marketId }: { marketId?: string }) {
     <div className="page-shell">
       <div className="page-content">
         <section className="market-state-card app-panel-subtle px-6 py-7 md:px-8 md:py-8">
-          <p className="eyebrow">Market missing</p>
+          <p className="eyebrow">Not found</p>
           <h1 className="type-heading-sm mt-3 uppercase">
-            We could not find that market
+            Market not found
           </h1>
           <p className="mt-4 max-w-2xl text-[color:var(--text-muted)]">
             {marketId
-              ? `No market detail was returned for ${marketId}.`
-              : "The requested market id is missing from the URL."}
+              ? "This market doesn't exist or may have been removed."
+              : "No market was specified in the URL."}
           </p>
           <Link className="action-secondary mt-6 inline-flex no-underline" to="/">
-            Back to board
+            All markets
           </Link>
         </section>
       </div>
@@ -614,328 +654,93 @@ function MarketNotFound({ marketId }: { marketId?: string }) {
   );
 }
 
-function ResolvedMarketSummary({
-  market,
-  resolvedLabel,
-}: {
-  market: MarketDto;
-  resolvedLabel: string;
-}) {
-  return (
-    <section className="resolved-market-panel app-panel-subtle overflow-hidden px-5 py-6 md:px-8 md:py-8">
-      <div className="resolved-market-panel-hero">
-        <div>
-          <p className="eyebrow">Market closed</p>
-          <h2 className="type-heading-lg mt-3 uppercase">{resolvedLabel}</h2>
-          <p className="resolved-market-panel-copy">
-            This market has finished resolving, so the live chart and rolling
-            update feed are no longer shown on this screen.
-          </p>
-        </div>
 
-        <span className="market-status-pill market-status-pill-resolved">
-          Resolved market
-        </span>
-      </div>
-
-      <div className="resolved-market-summary">
-        {market.outcomes.map((outcome) => {
-          const isWinningOutcome = outcome.outcomeId === market.resolvedOutcome;
-
-          return (
-            <article
-              key={outcome.outcomeId}
-              className={`resolved-market-summary-card ${
-                isWinningOutcome ? "resolved-market-summary-card-winning" : ""
-              }`}
-            >
-              <span className="eyebrow">
-                {isWinningOutcome ? "Winning outcome" : "Closed outcome"}
-              </span>
-              <strong>{outcome.label}</strong>
-              <span>{formatProbability(outcome.probability)}</span>
-            </article>
-          );
-        })}
-
-        <article className="resolved-market-summary-card">
-          <span className="eyebrow">Settled volume</span>
-          <strong>{formatCompactCurrency(market.totalValue)}</strong>
-          <span>Total market volume recorded at close</span>
-        </article>
-      </div>
-    </section>
-  );
+function getOutcomeIcon(outcomeId: string, index: number) {
+  if (outcomeId === "YES") return "trending_up";
+  if (outcomeId === "NO") return "trending_down";
+  return index === 0 ? "trending_up" : "trending_down";
 }
 
 function MarketPositionPanel({
   isAuthenticated,
-  isError,
-  isLoading,
-  market,
   onRetry,
   position,
   tradeDestination,
+  isError,
+  isLoading,
 }: {
   isAuthenticated: boolean;
-  isError: boolean;
-  isLoading: boolean;
-  market: MarketDto;
+  market?: MarketDto;
   onRetry: () => void;
   position?: MarketUserPositionDto;
   tradeDestination: string;
+  isError: boolean;
+  isLoading: boolean;
 }) {
-  const hasExposure = hasMarketExposure(position);
-  const yesLabel = getOutcomeLabel(market, "YES");
-  const noLabel = getOutcomeLabel(market, "NO");
-  const isResolvedMarket = market.status === "RESOLVED";
-  const resolvedOutcomeLabel = market.resolvedOutcome
-    ? getOutcomeLabel(market, market.resolvedOutcome)
-    : "Awaiting resolution";
-  const realizedPayout = position?.realizedPayout ?? 0;
-  const realizedNetPnl = position?.realizedNetPnl ?? 0;
-  const resultToneClass =
-    realizedNetPnl > 0
-      ? "market-position-card-positive"
-      : realizedNetPnl < 0
-        ? "market-position-card-negative"
-        : "market-position-card-neutral";
-
   if (!isAuthenticated) {
     return (
-      <section className="market-position-panel app-panel-subtle overflow-hidden">
-        <div className="market-position-shell">
-          <div className="market-position-header">
-            <div>
-              <p className="eyebrow">Your market ledger</p>
-              <h2 className="type-heading-sm mt-3 uppercase">
-                Sign in to track this market
-              </h2>
-            </div>
-            <span className="market-position-status">Private desk view</span>
-          </div>
-
-          <p className="market-position-copy">
-            Once you enter the desk, this panel will show your invested amount,
-            outcome exposure, and payout view for this exact market.
-          </p>
-
-          <div className="market-position-grid">
-            <article className="market-position-card market-position-card-primary">
-              <span className="eyebrow">Track investment</span>
-              <strong>Live market</strong>
-              <span>See how much of your desk is riding on this market.</span>
-            </article>
-            <article className="market-position-card">
-              <span className="eyebrow">See settlement</span>
-              <strong>Clear payout view</strong>
-              <span>Know what each closing outcome would return to you.</span>
-            </article>
-          </div>
-
-          <Link
-            className="action-primary market-position-cta no-underline"
-            to={tradeDestination}
-          >
-            Sign in to unlock your ledger
-          </Link>
-        </div>
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
+        <p className="eyebrow mb-2">Your position</p>
+        <p className="type-body-sm text-[color:var(--text-muted)] mb-4">
+          Sign in to see your position in this market.
+        </p>
+        <Link className="action-secondary w-full justify-center no-underline" to={tradeDestination}>
+          Sign in
+        </Link>
       </section>
     );
   }
 
-  if (isLoading && !position) {
+  if (isLoading) {
     return (
-      <section className="market-position-panel app-panel-subtle overflow-hidden">
-        <div className="market-position-shell">
-          <div className="market-position-loading">
-            <div className="market-position-loading-block h-4 w-36" />
-            <div className="market-position-loading-block h-16 w-full" />
-            <div className="market-position-loading-grid">
-              <div className="market-position-loading-block h-28 w-full" />
-              <div className="market-position-loading-block h-28 w-full" />
-            </div>
-          </div>
-        </div>
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5 animate-pulse">
+        <div className="h-4 w-24 bg-[var(--surface-soft)] rounded mb-4" />
+        <div className="h-16 w-full bg-[var(--surface-soft)] rounded" />
       </section>
     );
   }
 
   if (isError) {
     return (
-      <section className="market-position-panel app-panel-subtle overflow-hidden">
-        <div className="market-position-shell">
-          <div className="market-position-header">
-            <div>
-              <p className="eyebrow">Your market ledger</p>
-              <h2 className="type-heading-sm mt-3 uppercase">
-                Position data is temporarily unavailable
-              </h2>
-            </div>
-            <span className="market-position-status">Retry needed</span>
-          </div>
-
-          <p className="market-position-copy">
-            The new market position endpoint did not return a usable response yet.
-            Retry this panel without losing the rest of the market screen.
-          </p>
-
-          <button className="action-secondary market-position-cta" onClick={onRetry} type="button">
-            Retry position data
-          </button>
-        </div>
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
+        <p className="eyebrow mb-2">Position error</p>
+        <p className="type-body-sm text-[color:var(--text-muted)] mb-4">
+          Could not load your position.
+        </p>
+        <button className="action-secondary" type="button" onClick={onRetry}>
+          Retry
+        </button>
       </section>
     );
   }
 
-  if (!position) {
+  if (!position || position.tradeCount === 0) {
     return null;
   }
 
   return (
-    <section className="market-position-panel app-panel-subtle overflow-hidden">
-      <div className="market-position-shell">
-        <div className="market-position-header">
-          <div>
-            <p className="eyebrow">
-              {isResolvedMarket ? "Your settled slip" : "Your market ledger"}
-            </p>
-            <h2 className="type-heading-sm mt-3 uppercase">
-              {isResolvedMarket
-                ? hasExposure
-                  ? "Your position has closed"
-                  : "No position was booked here"
-                : hasExposure
-                  ? "Your exposure is live"
-                  : "No live position yet"}
-            </h2>
+    <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
+      <p className="eyebrow mb-3">Your position</p>
+      <div className="space-y-2 type-body-sm">
+        <div className="flex justify-between">
+          <span className="text-[color:var(--text-muted)]">Invested</span>
+          <span className="font-mono font-semibold">{"\u0192"}{position.totalInvested.toFixed(2)}</span>
+        </div>
+        {position.yesSharesHeld > 0 ? (
+          <div className="flex justify-between">
+            <span className="text-[color:var(--text-muted)]">Yes shares</span>
+            <span className="font-mono font-semibold">{position.yesSharesHeld.toFixed(2)}</span>
           </div>
-          <span className="market-position-status">
-            {isResolvedMarket ? "Resolved market" : `${position.tradeCount} trade${position.tradeCount === 1 ? "" : "s"}`}
-          </span>
-        </div>
-
-        {isResolvedMarket ? (
-          <>
-            <div className="market-position-hero">
-              <span className="eyebrow">Settled payout</span>
-              <strong>{formatFCoinAmount(realizedPayout)}</strong>
-              <p>
-                {hasExposure
-                  ? `Resolved to ${resolvedOutcomeLabel}. This reflects the actual payout returned after settlement.`
-                  : "You did not hold a position when this market settled."}
-              </p>
-            </div>
-
-            <div className="market-position-grid">
-              <article className="market-position-card">
-                <span className="eyebrow">Total invested</span>
-                <strong>{formatFCoinAmount(position.totalInvested)}</strong>
-                <span>Combined cost basis across every fill in this market.</span>
-              </article>
-              <article className={`market-position-card ${resultToneClass}`}>
-                <span className="eyebrow">Net result</span>
-                <strong>{formatFCoinDelta(realizedNetPnl)}</strong>
-                <span>
-                  {realizedNetPnl > 0
-                    ? "You closed this market in profit."
-                    : realizedNetPnl < 0
-                      ? "This market settled below your cost basis."
-                      : "This market closed flat against your cost basis."}
-                </span>
-              </article>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="market-position-hero">
-              <span className="eyebrow">Current investment</span>
-              <strong>{formatFCoinAmount(position.totalInvested)}</strong>
-              <p>
-                {hasExposure
-                  ? `You are currently holding ${formatShareCount(position.yesSharesHeld + position.noSharesHeld)} across this market.`
-                  : "No orders have been filled here yet. Once you trade, this ledger will track your exposure and closing payout view."}
-              </p>
-            </div>
-
-            <div className="market-position-grid">
-              <article className="market-position-card market-position-card-primary">
-                <span className="eyebrow">{yesLabel} closes</span>
-                <strong>{formatFCoinAmount(position.projectedPayoutIfYes)}</strong>
-                <span>
-                  {formatShareCount(position.yesSharesHeld)} held ·{" "}
-                  {formatProbability(position.currentYesChance)} live chance
-                </span>
-              </article>
-              <article className="market-position-card">
-                <span className="eyebrow">{noLabel} closes</span>
-                <strong>{formatFCoinAmount(position.projectedPayoutIfNo)}</strong>
-                <span>
-                  {formatShareCount(position.noSharesHeld)} held ·{" "}
-                  {formatProbability(position.currentNoChance)} live chance
-                </span>
-              </article>
-            </div>
-          </>
-        )}
-
-        <div className="market-position-detail-grid">
-          <article className="market-position-metric">
-            <span className="eyebrow">Invested on {yesLabel}</span>
-            <strong>{formatFCoinAmount(position.totalYesInvested)}</strong>
-          </article>
-          <article className="market-position-metric">
-            <span className="eyebrow">Invested on {noLabel}</span>
-            <strong>{formatFCoinAmount(position.totalNoInvested)}</strong>
-          </article>
-          <article className="market-position-metric">
-            <span className="eyebrow">Last activity</span>
-            <strong>{formatLedgerTimestamp(position.lastTradeAt)}</strong>
-          </article>
-        </div>
-
-        <div className="market-position-footer">
-          <div>
-            <span className="eyebrow">Trade activity</span>
-            <p>
-              {position.tradeCount > 0
-                ? `${position.tradeCount} fill${position.tradeCount === 1 ? "" : "s"} since ${formatLedgerTimestamp(position.firstTradeAt)}`
-                : "No fills recorded on this market yet."}
-            </p>
+        ) : null}
+        {position.noSharesHeld > 0 ? (
+          <div className="flex justify-between">
+            <span className="text-[color:var(--text-muted)]">No shares</span>
+            <span className="font-mono font-semibold">{position.noSharesHeld.toFixed(2)}</span>
           </div>
-
-          {position.trades.length > 0 ? (
-            <div className="market-position-trade-stack">
-              {position.trades.slice(0, 2).map((trade) => (
-                <div key={trade.tradeId} className="market-position-trade-pill">
-                  <span>{getOutcomeLabel(market, trade.outcome)}</span>
-                  <strong>{formatFCoinAmount(trade.cost)}</strong>
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        ) : null}
       </div>
     </section>
   );
-}
-
-function buildDescriptionBlocks(market: MarketDto) {
-  const category = getMarketCategory(market.category);
-  const liveOutcomeSummary = market.outcomes
-    .map(
-      (outcome) =>
-        `${outcome.label} at ${formatProbability(outcome.probability)}`,
-    )
-    .join(", ");
-
-  return [
-    `${market.marketName} is loaded from the live market detail endpoint with category ${category}, status ${market.status}, and reported volume ${formatCompactCurrency(market.totalValue)}.`,
-    market.resolvedOutcome
-      ? `The current payload marks this market as resolved to ${market.resolvedOutcome}. The outcome snapshot right now is ${liveOutcomeSummary}.`
-      : `The current payload marks this market as open. The live outcome snapshot right now is ${liveOutcomeSummary}.`,
-    "Resolution notes, supporting links, and historical commentary are still placeholder content on this screen until the backend exposes richer market-detail fields.",
-  ];
 }
 
 function getLeadOutcome(outcomes: MarketOutcomeDto[]) {
@@ -994,13 +799,6 @@ function formatAmountInput(value: number) {
   return value.toFixed(2).replace(/\.?0+$/, "");
 }
 
-function shortenMarketId(marketId: string) {
-  if (marketId.length <= 16) {
-    return marketId;
-  }
-
-  return `${marketId.slice(0, 8)}...${marketId.slice(-4)}`;
-}
 
 function ChartHistoryLoading() {
   return (
@@ -1022,13 +820,12 @@ function ChartHistoryLoading() {
 function ChartHistoryError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="market-chart-state">
-      <p className="eyebrow">History unavailable</p>
+      <p className="eyebrow">Error</p>
       <h2 className="type-heading-sm mt-3 uppercase">
-        We could not load this chart
+        Could not load price history
       </h2>
       <p className="mt-4 max-w-xl text-[color:var(--text-muted)]">
-        The history endpoint did not return a usable graph snapshot yet. Retry
-        the chart request while keeping the rest of the market page visible.
+        Please try again.
       </p>
       <button className="action-secondary mt-6" onClick={onRetry} type="button">
         Retry chart
@@ -1042,11 +839,10 @@ function ChartHistoryEmpty() {
     <div className="market-chart-state">
       <p className="eyebrow">No history yet</p>
       <h2 className="type-heading-sm mt-3 uppercase">
-        The chart is waiting for its first point
+        No price history available
       </h2>
       <p className="mt-4 max-w-xl text-[color:var(--text-muted)]">
-        This market detail loaded, but the backend has not returned any history
-        points for the selected range yet.
+        Price history will appear here after the first trade.
       </p>
     </div>
   );
@@ -1121,43 +917,3 @@ function formatRelativeTimestamp(timestamp: string) {
   }).format(date);
 }
 
-function formatLedgerTimestamp(timestamp: string | null) {
-  if (!timestamp) {
-    return "No activity";
-  }
-
-  return formatRelativeTimestamp(timestamp);
-}
-
-function getOutcomeLabel(
-  market: MarketDto,
-  outcomeId: MarketOutcomeDto["outcomeId"],
-) {
-  return (
-    market.outcomes.find((outcome) => outcome.outcomeId === outcomeId)?.label ??
-    outcomeId
-  );
-}
-
-function hasMarketExposure(position?: MarketUserPositionDto) {
-  if (!position) {
-    return false;
-  }
-
-  return (
-    position.tradeCount > 0 ||
-    position.totalInvested > 0 ||
-    position.yesSharesHeld > 0 ||
-    position.noSharesHeld > 0
-  );
-}
-
-function formatShareCount(value: number) {
-  const shares = Number.isFinite(value) ? value : 0;
-  const formatted = new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 3,
-    minimumFractionDigits: shares > 0 && shares < 1 ? 3 : 0,
-  }).format(shares);
-
-  return `${formatted} share${shares === 1 ? "" : "s"}`;
-}

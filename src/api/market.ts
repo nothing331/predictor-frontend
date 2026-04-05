@@ -10,6 +10,7 @@ export type MarketOutcomeDto = {
 export type MarketDto = {
   marketId: string;
   marketName: string;
+  description?: string;
   status: "OPEN" | "RESOLVED";
   resolvedOutcome: "YES" | "NO" | null;
   category?: string;
@@ -166,5 +167,32 @@ export async function resolveMarket(
 
 export async function createMarket(payload: CreateMarketRequest) {
   const { data } = await apiClient.post<CreateMarketResponse>("/v1/markets", payload);
+  return data;
+}
+
+export type MarketPositionResponse = {
+  userId: string;
+  marketId: string;
+  marketName: string;
+  marketStatus: "OPEN" | "RESOLVED";
+  resolvedOutcome: "YES" | "NO" | null;
+  currentYesChance: number;
+  currentNoChance: number;
+  yesSharesHeld: number;
+  noSharesHeld: number;
+  totalInvested: number;
+  totalYesInvested: number;
+  totalNoInvested: number;
+  projectedPayoutIfYes: number;
+  projectedPayoutIfNo: number;
+  realizedPayout: number | null;
+  realizedNetPnl: number | null;
+  tradeCount: number;
+};
+
+export async function getMarketPosition(marketId: string) {
+  const { data } = await apiClient.get<MarketPositionResponse>(
+    `/v1/markets/${encodeURIComponent(marketId)}/me`,
+  );
   return data;
 }

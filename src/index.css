@@ -3064,11 +3064,121 @@ a {
 
 @media (max-width: 768px) {
   .page-content {
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 
   .display-title {
-    font-size: var(--step-40);
+    font-size: var(--step-28);
+  }
+
+  .section-title {
+    font-size: var(--step-20);
+  }
+
+  .type-heading-lg {
+    font-size: var(--step-24);
+  }
+
+  .type-heading-md {
+    font-size: var(--step-20);
+  }
+
+  .type-heading-sm {
+    font-size: var(--step-16);
+  }
+
+  .type-value-lg {
+    font-size: var(--step-28);
+  }
+
+  .type-value-md {
+    font-size: var(--step-24);
+  }
+
+  .type-body-lg {
+    font-size: var(--step-16);
+  }
+
+  .brand-sigil {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+
+  .brand-wordmark {
+    font-size: var(--step-24);
+  }
+
+  .action-primary,
+  .action-secondary,
+  .action-ghost {
+    font-size: var(--step-12);
+    padding: 0.7rem 0.9rem;
+  }
+
+  .chip {
+    font-size: 0.65rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .trade-outcome-option {
+    font-size: var(--step-16);
+    min-height: 3.4rem;
+    padding: 0.7rem 0.85rem;
+  }
+
+  .metric-value {
+    font-size: var(--step-28);
+  }
+
+  .market-history-signal,
+  .market-history-meta {
+    min-width: 6rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .market-history-signal-value,
+  .market-history-meta-value {
+    font-size: var(--step-20);
+  }
+
+  .profile-chip {
+    min-height: 3rem;
+    gap: 0.5rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.3rem;
+  }
+
+  .profile-avatar {
+    height: 2.25rem;
+    width: 2.25rem;
+    font-size: var(--step-16);
+  }
+
+  .profile-meta strong {
+    font-size: var(--step-12);
+  }
+
+  .search-shell {
+    min-height: 3rem;
+    padding-inline: 0.85rem;
+  }
+
+  .search-input {
+    min-height: 3rem;
+  }
+
+  .app-input {
+    min-height: 2.75rem;
+    font-size: var(--step-12);
+  }
+
+  .field-shell {
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+  }
+
+  .eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
   }
 
   .launchpad-grid,
