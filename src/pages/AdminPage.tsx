@@ -41,8 +41,27 @@ const categoryPresets = [
 export default function AdminPage() {
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const hasHydrated = AuthStore((state) => state.hasHydrated);
+  const isRefreshing = AuthStore((state) => state.isRefreshing);
   const role = AuthStore((state) => state.role);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+
+  if (!hasHydrated || isRefreshing) {
+    return (
+      <div className="page-shell">
+        <div className="page-content">
+          <AppHeader />
+          <div className="space-y-5 md:space-y-8">
+            <div className="app-panel-subtle h-24 md:h-28 animate-pulse" />
+            <div className="grid gap-5 md:gap-8 lg:grid-cols-2">
+              <section className="app-panel h-[32rem] animate-pulse" />
+              <section className="app-panel h-[24rem] animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || role !== "ADMIN") {
     return <Navigate replace to="/" />;

@@ -22,6 +22,8 @@ interface AuthState {
   role: "USER" | "ADMIN" | null;
   giftAvailable: boolean;
   nextGiftAt: string | null;
+  hasHydrated: boolean;
+  isRefreshing: boolean;
 
   saveAuth: (
     accessToken: string,
@@ -39,6 +41,8 @@ interface AuthState {
   }) => void;
   updateBalance: (balance: number) => void;
   updateGift: (giftAvailable: boolean, nextGiftAt: string | null) => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
+  setRefreshing: (isRefreshing: boolean) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
 }
@@ -54,6 +58,8 @@ export const AuthStore = create<AuthState>()(
       role: null,
       giftAvailable: false,
       nextGiftAt: null,
+      hasHydrated: false,
+      isRefreshing: false,
 
       saveAuth: (accessToken, refreshToken, expiresInSeconds, profile) => {
         const payload = decodeJwtPayload<{ role?: string }>(accessToken);
@@ -64,6 +70,7 @@ export const AuthStore = create<AuthState>()(
           expiresAt: Date.now() + expiresInSeconds * 1000,
           profile: profile !== undefined ? profile : get().profile,
           role: getSessionRole(payload?.role),
+          isRefreshing: false,
         });
       },
 
@@ -82,6 +89,10 @@ export const AuthStore = create<AuthState>()(
       updateGift: (giftAvailable, nextGiftAt) =>
         set({ giftAvailable, nextGiftAt }),
 
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+
+      setRefreshing: (isRefreshing) => set({ isRefreshing }),
+
       logout: () =>
         set({
           accessToken: null,
@@ -92,6 +103,7 @@ export const AuthStore = create<AuthState>()(
           role: null,
           giftAvailable: false,
           nextGiftAt: null,
+          isRefreshing: false,
         }),
 
       isAuthenticated: () => {
@@ -111,6 +123,9 @@ export const AuthStore = create<AuthState>()(
         giftAvailable: state.giftAvailable,
         nextGiftAt: state.nextGiftAt,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

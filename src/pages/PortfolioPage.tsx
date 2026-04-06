@@ -11,6 +11,8 @@ import { isSessionAuthenticated } from "@/utils/auth";
 export default function PortfolioPage() {
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const hasHydrated = AuthStore((state) => state.hasHydrated);
+  const isRefreshing = AuthStore((state) => state.isRefreshing);
   const balance = AuthStore((state) => state.balance);
   const profile = AuthStore((state) => state.profile);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
@@ -26,6 +28,25 @@ export default function PortfolioPage() {
     queryFn: getUserSummary,
     staleTime: 60 * 1000,
   });
+
+  if (!hasHydrated || isRefreshing) {
+    return (
+      <div className="page-shell">
+        <div className="page-content">
+          <AppHeader />
+          <main className="space-y-5 md:space-y-8">
+            <section className="app-panel-subtle h-36 md:h-40 animate-pulse" />
+            <section className="grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }, (_, i) => (
+                <div key={i} className="app-panel-subtle h-32 md:h-40 animate-pulse" />
+              ))}
+            </section>
+          </main>
+          <SiteFooter />
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate replace to="/login?redirectTo=/portfolio" />;

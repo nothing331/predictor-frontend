@@ -16,7 +16,10 @@ export default function HomePage() {
   const { data: resolvedMarkets = [], isLoading: isResolvedLoading } = useMarkets("RESOLVED");
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const hasHydrated = AuthStore((state) => state.hasHydrated);
+  const isRefreshing = AuthStore((state) => state.isRefreshing);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const isAuthPending = !hasHydrated || isRefreshing;
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
 
@@ -139,7 +142,9 @@ export default function HomePage() {
           </main>
 
           <aside className="lg:sticky lg:top-6 lg:self-start">
-            {isAuthenticated ? (
+            {isAuthPending ? (
+              <div className="app-panel-subtle h-56 animate-pulse" />
+            ) : isAuthenticated ? (
               <HomeSidebar />
             ) : (
               <SignupIncentiveCard />

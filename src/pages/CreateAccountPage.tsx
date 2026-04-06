@@ -7,10 +7,26 @@ import { isSessionAuthenticated } from "../utils/auth";
 export default function CreateAccountPage() {
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const hasHydrated = AuthStore((state) => state.hasHydrated);
+  const isRefreshing = AuthStore((state) => state.isRefreshing);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
 
   if (isAuthenticated) {
     return <Navigate replace to="/" />;
+  }
+
+  if (!hasHydrated || isRefreshing) {
+    return (
+      <AuthScaffold
+        eyebrow="Get started"
+        subtitle="Checking your saved session."
+        title="Restoring session"
+      >
+        <div className="mx-auto w-full max-w-md">
+          <div className="app-panel-subtle animate-pulse h-14 w-full rounded-full" />
+        </div>
+      </AuthScaffold>
+    );
   }
 
   return (

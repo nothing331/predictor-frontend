@@ -48,7 +48,10 @@ export default function MarketPage() {
   const marketId = parseMarketIdParam(marketIdParam);
   const accessToken = AuthStore((state) => state.accessToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const hasHydrated = AuthStore((state) => state.hasHydrated);
+  const isRefreshing = AuthStore((state) => state.isRefreshing);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
+  const isAuthPending = !hasHydrated || isRefreshing;
   const {
     data: market,
     error,
@@ -443,6 +446,14 @@ export default function MarketPage() {
                   >
                     Market resolved
                   </button>
+                ) : isAuthPending ? (
+                  <button
+                    className="action-secondary w-full justify-center"
+                    disabled
+                    type="button"
+                  >
+                    Restoring session...
+                  </button>
                 ) : isAuthenticated ? (
                   <button
                     className={`w-full justify-center ${
@@ -557,6 +568,7 @@ export default function MarketPage() {
 
             <MarketPositionPanel
               isAuthenticated={isAuthenticated}
+              isAuthPending={isAuthPending}
               market={market}
               onRetry={() => marketPositionQuery.refetch()}
               position={marketPositionQuery.data}
@@ -663,6 +675,7 @@ function getOutcomeIcon(outcomeId: string, index: number) {
 
 function MarketPositionPanel({
   isAuthenticated,
+  isAuthPending,
   onRetry,
   position,
   tradeDestination,
@@ -670,6 +683,7 @@ function MarketPositionPanel({
   isLoading,
 }: {
   isAuthenticated: boolean;
+  isAuthPending: boolean;
   market?: MarketDto;
   onRetry: () => void;
   position?: MarketUserPositionDto;
@@ -677,6 +691,15 @@ function MarketPositionPanel({
   isError: boolean;
   isLoading: boolean;
 }) {
+  if (isAuthPending) {
+    return (
+      <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5 animate-pulse">
+        <div className="h-4 w-24 bg-[var(--surface-soft)] rounded mb-4" />
+        <div className="h-16 w-full bg-[var(--surface-soft)] rounded" />
+      </section>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <section className="app-panel-subtle overflow-hidden px-3.5 py-4 md:px-6 md:py-6 mt-5">
@@ -916,4 +939,3 @@ function formatRelativeTimestamp(timestamp: string) {
     month: "short",
   }).format(date);
 }
-
