@@ -9,12 +9,18 @@ export default function HeaderAccountActions() {
   const accessToken = AuthStore((state) => state.accessToken);
   const refreshToken = AuthStore((state) => state.refreshToken);
   const expiresAt = AuthStore((state) => state.expiresAt);
+  const hasHydrated = AuthStore((state) => state.hasHydrated);
+  const isRefreshing = AuthStore((state) => state.isRefreshing);
   const profile = AuthStore((state) => state.profile);
   const role = AuthStore((state) => state.role);
   const logout = AuthStore((state) => state.logout);
   const isAuthenticated = isSessionAuthenticated(accessToken, expiresAt);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  if (!hasHydrated || isRefreshing) {
+    return <div className="h-11 w-28 rounded-full bg-[var(--surface-soft)] animate-pulse" />;
+  }
 
   if (!isAuthenticated) {
     return (

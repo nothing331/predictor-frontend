@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuthBootstrap } from "./hooks/useAuthBootstrap";
 import { useAuthMe } from "./hooks/useAuthMe";
 import AdminPage from "./pages/AdminPage";
 import HomePage from "./pages/HomePage";
@@ -9,7 +10,10 @@ import PortfolioPage from "./pages/PortfolioPage";
 import { MARKET_ROUTE_PATTERN } from "./features/markets/marketRoutes";
 
 export default function App() {
-  // Hydrate user data (balance, role, gift status) when authenticated
+  // Restore a persisted session before auth-guarded screens decide to redirect.
+  useAuthBootstrap();
+
+  // Hydrate user data (balance, role, gift status) when authenticated.
   useAuthMe();
 
   return (
