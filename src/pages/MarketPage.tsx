@@ -66,7 +66,7 @@ export default function MarketPage() {
     isError: isHistoryError,
     isLoading: isHistoryLoading,
     refetch: refetchHistory,
-  } = useMarketHistory(marketId, activeRange, market?.status === "OPEN");
+  } = useMarketHistory(marketId, activeRange);
   const tradeMutation = useCreateTrade(marketId);
   const { data: position } = useMarketPosition(marketId);
   const [selectedOutcome, setSelectedOutcome] =
